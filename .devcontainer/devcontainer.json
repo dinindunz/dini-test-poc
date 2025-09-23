@@ -16,8 +16,12 @@
 	],
 	"containerEnv": {
 		"AWS_REGION": "ap-southeast-2",
-		"AWS_PROFILE": "mantel-sandpit2"
+		"AWS_PROFILE": "mantel-sandpit2"		
 	},
+	"remoteEnv": {
+		"GITHUB_TOKEN": "${localEnv:GITHUB_PERSONAL_ACCESS_TOKEN}"
+	},
+	"postCreateCommand": "echo \"$GITHUB_TOKEN\" | gh auth login --with-token",
 	"customizations": {
 		"vscode": {
 			"settings": {
