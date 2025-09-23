@@ -1,0 +1,639 @@
+{
+  "timestamp": "2025-09-22T05:20:30.281593",
+  "user_prompt": "in dinindunz/sample-spring-boot github repo \"Add a new 'PREPARING' status between 'CONFIRMED' and 'SHIPPED' in the order workflow\" Don't do any code build or run tests. Only raise a PR with required code changes.",
+  "system_prompt_template": "context_aware",
+  "metrics_summary": {
+    "total_cycles": 11,
+    "total_duration": 7.667473793029785,
+    "average_cycle_time": 0.6970430720936168,
+    "tool_usage": {
+      "shell": {
+        "tool_info": {
+          "tool_use_id": "tooluse_WzseD8ZfQaKRGgo5t1sjHg",
+          "name": "shell",
+          "input_params": {
+            "command": "gh pr create --title \"feat: add PREPARING order status between CONFIRMED and SHIPPED\" --body \"## Changes Made\n\nAdded a new 'PREPARING' status to the order workflow between 'CONFIRMED' and 'SHIPPED' states to provide better granularity in order tracking.\n\n### Changes\n- Modified OrderStatus enum to include PREPARING status\n- Added markAsPreparing() helper method for easy status transition\n- Replaced PROCESSING with PREPARING to maintain correct order flow\n\n### Order Status Flow\nThe new order workflow sequence is:\n```\nPENDING → CONFIRMED → PREPARING → SHIPPED → DELIVERED\n```\n\n### Implementation Details\n- Added new PREPARING status in the OrderStatus enum\n- Added helper method markAsPreparing() for convenient status updates\n- No database changes needed as enum is stored as STRING\n- No changes needed in OrderRepository as it uses the enum dynamically\n\n### Testing Notes\n- No tests were run as per requirements\n- Changes are additive and maintain backward compatibility\n- Database schema will automatically accommodate the new enum value\" --web"
+          }
+        },
+        "execution_stats": {
+          "call_count": 7,
+          "success_count": 6,
+          "error_count": 1,
+          "total_time": 2.1057426929473877,
+          "average_time": 0.3008203847067697,
+          "success_rate": 0.8571428571428571
+        }
+      },
+      "file_read": {
+        "tool_info": {
+          "tool_use_id": "tooluse_6_2oOIx7TUujMkCPBhfY-w",
+          "name": "file_read",
+          "input_params": {
+            "path": "./sample-spring-boot/src/main/java/com/example/ecommerce/entity/Order.java",
+            "mode": "view"
+          }
+        },
+        "execution_stats": {
+          "call_count": 1,
+          "success_count": 1,
+          "error_count": 0,
+          "total_time": 0.07036662101745605,
+          "average_time": 0.07036662101745605,
+          "success_rate": 1.0
+        }
+      },
+      "editor": {
+        "tool_info": {
+          "tool_use_id": "tooluse_JzdrcnhdTV-2phtsZUpQyg",
+          "name": "editor",
+          "input_params": {
+            "command": "insert",
+            "path": "./sample-spring-boot/src/main/java/com/example/ecommerce/entity/Order.java",
+            "insert_line": "    public void markAsDelivered() {",
+            "new_str": "    public void markAsPreparing() {\n        this.status = OrderStatus.PREPARING;\n    }\n"
+          }
+        },
+        "execution_stats": {
+          "call_count": 2,
+          "success_count": 2,
+          "error_count": 0,
+          "total_time": 0.029059648513793945,
+          "average_time": 0.014529824256896973,
+          "success_rate": 1.0
+        }
+      }
+    },
+    "traces": [
+      {
+        "id": "0d99408a-ccc1-40c9-9029-9964c61cd5b2",
+        "name": "Cycle 1",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518381.2794402,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "1a0c7d04-6544-4a72-82ba-ac6efc3be215",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "0d99408a-ccc1-40c9-9029-9964c61cd5b2",
+            "start_time": 1758518381.2796261,
+            "end_time": 1758518382.2214522,
+            "duration": 0.9418261051177979,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "b583ee6f-3cee-4f8c-bd44-ec5e221921d4",
+            "name": "Tool: shell",
+            "raw_name": "shell - tooluse_s2giLsH_TRWBDE3dRRLnaQ",
+            "parent_id": "0d99408a-ccc1-40c9-9029-9964c61cd5b2",
+            "start_time": 1758518382.2302287,
+            "end_time": 1758518383.49512,
+            "duration": 1.2648913860321045,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_s2giLsH_TRWBDE3dRRLnaQ",
+              "tool_name": "shell"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "5d703953-8082-43aa-af2d-56f33870116b",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "0d99408a-ccc1-40c9-9029-9964c61cd5b2",
+            "start_time": 1758518383.4957037,
+            "end_time": 1758518430.2694035,
+            "duration": 46.77369976043701,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "b28cdb97-3e7b-416b-93f4-f761718e6a88",
+        "name": "Cycle 2",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518383.495736,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "3e0e0c8a-46b5-4ca6-90b4-fb41c8b307f3",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "b28cdb97-3e7b-416b-93f4-f761718e6a88",
+            "start_time": 1758518383.4958918,
+            "end_time": 1758518386.5756211,
+            "duration": 3.0797293186187744,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "bc3a185d-d3c8-4d0b-b257-128959b22f1c",
+            "name": "Tool: shell",
+            "raw_name": "shell - tooluse_N-OnhkOoRNGgRhq_SjTb3Q",
+            "parent_id": "b28cdb97-3e7b-416b-93f4-f761718e6a88",
+            "start_time": 1758518386.582357,
+            "end_time": 1758518386.6215131,
+            "duration": 0.039156198501586914,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_N-OnhkOoRNGgRhq_SjTb3Q",
+              "tool_name": "shell"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "f63d2ece-fa2d-4115-a1cf-4be284e542ef",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "b28cdb97-3e7b-416b-93f4-f761718e6a88",
+            "start_time": 1758518386.621854,
+            "end_time": 1758518430.2693582,
+            "duration": 43.64750409126282,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "696e7e88-0410-40e5-9777-dad7b8bfe77d",
+        "name": "Cycle 3",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518386.6219087,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "2703b7d1-da3f-463a-9c89-ba34804558ae",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "696e7e88-0410-40e5-9777-dad7b8bfe77d",
+            "start_time": 1758518386.6220946,
+            "end_time": 1758518389.2108066,
+            "duration": 2.588711977005005,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "ce551832-f51e-49a0-8256-2385a67a4dde",
+            "name": "Tool: shell",
+            "raw_name": "shell - tooluse_Vip7D4lgSNaVhCC_faRDNw",
+            "parent_id": "696e7e88-0410-40e5-9777-dad7b8bfe77d",
+            "start_time": 1758518389.2279863,
+            "end_time": 1758518389.34671,
+            "duration": 0.11872363090515137,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_Vip7D4lgSNaVhCC_faRDNw",
+              "tool_name": "shell"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "1d58fab9-9988-4d76-82b3-748275021487",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "696e7e88-0410-40e5-9777-dad7b8bfe77d",
+            "start_time": 1758518389.3471234,
+            "end_time": 1758518430.2693543,
+            "duration": 40.9222309589386,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "13e2fa73-11f2-480b-83aa-1d23d21bb52e",
+        "name": "Cycle 4",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518389.347156,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "888d0edc-f928-4590-a3a4-b11bb59ecc05",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "13e2fa73-11f2-480b-83aa-1d23d21bb52e",
+            "start_time": 1758518389.3473902,
+            "end_time": 1758518392.6102898,
+            "duration": 3.26289963722229,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "aaa2606b-fb7a-41b1-b7e8-6e7de370cace",
+            "name": "Tool: file_read",
+            "raw_name": "file_read - tooluse_6_2oOIx7TUujMkCPBhfY-w",
+            "parent_id": "13e2fa73-11f2-480b-83aa-1d23d21bb52e",
+            "start_time": 1758518392.6294348,
+            "end_time": 1758518392.699927,
+            "duration": 0.07049226760864258,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_6_2oOIx7TUujMkCPBhfY-w",
+              "tool_name": "file_read"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "44a872bb-fd22-4787-803f-53129e522da7",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "13e2fa73-11f2-480b-83aa-1d23d21bb52e",
+            "start_time": 1758518392.7003584,
+            "end_time": 1758518430.2693477,
+            "duration": 37.568989276885986,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "9379c8d0-b597-4c5c-b9de-d12133796f2f",
+        "name": "Cycle 5",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518392.7003806,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "b05ae7ec-f05b-40aa-a9c3-e4b374bbc852",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "9379c8d0-b597-4c5c-b9de-d12133796f2f",
+            "start_time": 1758518392.7006373,
+            "end_time": 1758518397.010931,
+            "duration": 4.310293674468994,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "d6076fe7-f325-4c19-83a4-95bf4976e2c0",
+            "name": "Tool: shell",
+            "raw_name": "shell - tooluse_utB4YJuMRECo8W6810WuRQ",
+            "parent_id": "9379c8d0-b597-4c5c-b9de-d12133796f2f",
+            "start_time": 1758518397.0122843,
+            "end_time": 1758518397.176757,
+            "duration": 0.1644728183746338,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_utB4YJuMRECo8W6810WuRQ",
+              "tool_name": "shell"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "8ef6917e-54d6-47f6-ab3e-9740b632ce3a",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "9379c8d0-b597-4c5c-b9de-d12133796f2f",
+            "start_time": 1758518397.1772592,
+            "end_time": 1758518430.2693326,
+            "duration": 33.09207344055176,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "be76407a-b509-40bc-ade7-9efcb54a6095",
+        "name": "Cycle 6",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518397.1773036,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "3bfbc9b4-101f-4d54-92d1-0b6cdd096e1e",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "be76407a-b509-40bc-ade7-9efcb54a6095",
+            "start_time": 1758518397.1776834,
+            "end_time": 1758518402.4964395,
+            "duration": 5.318756103515625,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "41fa4e0b-2429-4c54-a743-d61ca673df14",
+            "name": "Tool: editor",
+            "raw_name": "editor - tooluse_godGoxszRVOMaO3kxXgs_Q",
+            "parent_id": "be76407a-b509-40bc-ade7-9efcb54a6095",
+            "start_time": 1758518402.501268,
+            "end_time": 1758518402.509836,
+            "duration": 0.008568048477172852,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_godGoxszRVOMaO3kxXgs_Q",
+              "tool_name": "editor"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "5a899504-2157-4ad2-bb13-1adf457c4f6a",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "be76407a-b509-40bc-ade7-9efcb54a6095",
+            "start_time": 1758518402.5101175,
+            "end_time": 1758518430.2693286,
+            "duration": 27.75921106338501,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "1f87cd13-43ca-47d5-b97c-622ed929a344",
+        "name": "Cycle 7",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518402.5101514,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "c63c2d03-9689-4e0a-9ac5-4f3fcf6c8436",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "1f87cd13-43ca-47d5-b97c-622ed929a344",
+            "start_time": 1758518402.5106454,
+            "end_time": 1758518406.967594,
+            "duration": 4.456948518753052,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "640e5c82-0fe9-48eb-8e05-80e88aabe5c4",
+            "name": "Tool: editor",
+            "raw_name": "editor - tooluse_JzdrcnhdTV-2phtsZUpQyg",
+            "parent_id": "1f87cd13-43ca-47d5-b97c-622ed929a344",
+            "start_time": 1758518406.9689639,
+            "end_time": 1758518406.989591,
+            "duration": 0.02062702178955078,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_JzdrcnhdTV-2phtsZUpQyg",
+              "tool_name": "editor"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "49ea4ae3-62bd-47de-87f7-70a60eaa89c1",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "1f87cd13-43ca-47d5-b97c-622ed929a344",
+            "start_time": 1758518406.9897761,
+            "end_time": 1758518430.2693038,
+            "duration": 23.27952766418457,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "69ca9583-5706-4a9c-9e45-044063461a36",
+        "name": "Cycle 8",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518406.9898014,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "87b1efc5-f338-4c2d-9e18-4ee06d97722d",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "69ca9583-5706-4a9c-9e45-044063461a36",
+            "start_time": 1758518406.9902713,
+            "end_time": 1758518410.5899122,
+            "duration": 3.5996408462524414,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "8a6efdb2-c6e2-4209-b542-317904aacfdd",
+            "name": "Tool: shell",
+            "raw_name": "shell - tooluse_OTKrdH0YQ-SsRoe6AhDFHg",
+            "parent_id": "69ca9583-5706-4a9c-9e45-044063461a36",
+            "start_time": 1758518410.5910258,
+            "end_time": 1758518410.7017553,
+            "duration": 0.11072945594787598,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_OTKrdH0YQ-SsRoe6AhDFHg",
+              "tool_name": "shell"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "cc411814-88e9-45d6-9038-7e46c2e82f45",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "69ca9583-5706-4a9c-9e45-044063461a36",
+            "start_time": 1758518410.7022398,
+            "end_time": 1758518430.2692997,
+            "duration": 19.567059993743896,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "ed5f7be3-a9bc-4e1c-a409-532864383efc",
+        "name": "Cycle 9",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518410.7023025,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "ba1a6f43-9c80-4409-85d6-674038baf185",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "ed5f7be3-a9bc-4e1c-a409-532864383efc",
+            "start_time": 1758518410.7029376,
+            "end_time": 1758518414.1542525,
+            "duration": 3.451314926147461,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "ccf95a91-7f37-4812-bd77-6335d6abe4b0",
+            "name": "Tool: shell",
+            "raw_name": "shell - tooluse_HNWCsS84SLCgyxxIoYQNNA",
+            "parent_id": "ed5f7be3-a9bc-4e1c-a409-532864383efc",
+            "start_time": 1758518414.1699374,
+            "end_time": 1758518414.30451,
+            "duration": 0.13457274436950684,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_HNWCsS84SLCgyxxIoYQNNA",
+              "tool_name": "shell"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "32fbe055-b94d-43d9-b2f1-164b9b3ffa9c",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "ed5f7be3-a9bc-4e1c-a409-532864383efc",
+            "start_time": 1758518414.3050225,
+            "end_time": 1758518430.2692745,
+            "duration": 15.96425199508667,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "24d9306b-03b3-49a6-af3f-4c223dde5424",
+        "name": "Cycle 10",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518414.3050847,
+        "end_time": null,
+        "duration": null,
+        "children": [
+          {
+            "id": "f57d35b2-16bc-4373-aae5-8b222411a0ad",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "24d9306b-03b3-49a6-af3f-4c223dde5424",
+            "start_time": 1758518414.3060405,
+            "end_time": 1758518422.3245018,
+            "duration": 8.018461227416992,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "93b859b0-2843-4974-9163-07788d9354b4",
+            "name": "Tool: shell",
+            "raw_name": "shell - tooluse_WzseD8ZfQaKRGgo5t1sjHg",
+            "parent_id": "24d9306b-03b3-49a6-af3f-4c223dde5424",
+            "start_time": 1758518422.3269978,
+            "end_time": 1758518422.6010563,
+            "duration": 0.27405858039855957,
+            "children": [],
+            "metadata": {
+              "toolUseId": "tooluse_WzseD8ZfQaKRGgo5t1sjHg",
+              "tool_name": "shell"
+            },
+            "message": "[CONTENT_EXCLUDED]"
+          },
+          {
+            "id": "b285ac7b-ad19-4c97-8a79-a45004bf9fba",
+            "name": "Recursive call",
+            "raw_name": null,
+            "parent_id": "24d9306b-03b3-49a6-af3f-4c223dde5424",
+            "start_time": 1758518422.6016624,
+            "end_time": 1758518430.269256,
+            "duration": 7.667593717575073,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      },
+      {
+        "id": "2872d3c2-18da-4f18-8598-49fc8f08f9a6",
+        "name": "Cycle 11",
+        "raw_name": null,
+        "parent_id": null,
+        "start_time": 1758518422.601696,
+        "end_time": 1758518430.2691698,
+        "duration": 7.667473793029785,
+        "children": [
+          {
+            "id": "2a5bcb65-baf6-4b30-95f8-b11343428a31",
+            "name": "stream_messages",
+            "raw_name": null,
+            "parent_id": "2872d3c2-18da-4f18-8598-49fc8f08f9a6",
+            "start_time": 1758518422.6023414,
+            "end_time": 1758518430.26906,
+            "duration": 7.666718482971191,
+            "children": [],
+            "metadata": {},
+            "message": "[CONTENT_EXCLUDED]"
+          }
+        ],
+        "metadata": {},
+        "message": "[CONTENT_EXCLUDED]"
+      }
+    ],
+    "accumulated_usage": {
+      "inputTokens": 120915,
+      "outputTokens": 1875,
+      "totalTokens": 122790
+    },
+    "accumulated_metrics": {
+      "latencyMs": 0
+    },
+    "context_managed": true,
+    "context_stats": {
+      "total_actions": 4,
+      "working_memory_size": 4,
+      "current_tokens": 159,
+      "token_utilisation": 0.0265,
+      "current_phase": "initialisation",
+      "decisions_made": 0,
+      "error_patterns": 0,
+      "goal_progress": 0,
+      "compression_events": 0,
+      "session_duration": 49.01290774345398,
+      "iterations_completed": 1,
+      "context_saves": 1
+    }
+  },
+  "formatted_timestamp": "22-09-25-05-20",
+  "traces_content_included": false
+}

@@ -1,0 +1,8 @@
+
+.DS_Store
+__pycache__
+*.pyc
+.env
+CLAUDE.md
+sample-spring-boot
+litellm/litellm_config.yaml

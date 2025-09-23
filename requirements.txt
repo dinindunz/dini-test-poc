@@ -1,0 +1,14 @@
+strands-agents
+strands-agents-tools
+strands-agents[litellm]
+bedrock-agentcore
+bedrock-agentcore-starter-toolkit
+python-dotenv
+tree-sitter>=0.20.0
+tree-sitter-javascript>=0.20.0
+tree-sitter-typescript>=0.20.0
+tree-sitter-java>=0.20.0
+watchdog>=3.0.0
+pathspec>=0.12.1
+msgpack>=1.0.0
+fastapi
