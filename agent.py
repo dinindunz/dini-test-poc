@@ -219,29 +219,29 @@ class InvokeRequest(BaseModel):
 async def invoke_agent(request: InvokeRequest):
     """Invoke the agent with a prompt"""
     try:
-        # Check if context management is enabled
-        use_context_management = effective_prompt_name and "context_aware" in effective_prompt_name.lower()
+        # Check if Redwood Agent is enabled
+        use_redwood_agent = effective_prompt_name and "redwood" in effective_prompt_name.lower()
 
-        if use_context_management:
-            # Use context-aware agent
+        if use_redwood_agent:
+            # Use Redwood Agent
             from context_manager.redwood_agent import create_redwood_agent
 
-            if not hasattr(invoke_agent, '_context_agent'):
-                print("🧠 Initialising context-aware agent")
-                invoke_agent._context_agent = create_redwood_agent(
+            if not hasattr(invoke_agent, '_redwood_agent'):
+                print("🌲 Initialising Redwood Agent")
+                invoke_agent._redwood_agent = create_redwood_agent(
                     agent,
                     {"max_working_memory": 12, "max_context_tokens": 6000}
                 )
 
-            context_agent = invoke_agent._context_agent
-            result = context_agent(request.prompt)
+            redwood_agent = invoke_agent._redwood_agent
+            result = redwood_agent(request.prompt)
 
             # Get context statistics
-            context_stats = context_agent.get_context_stats()
+            context_stats = redwood_agent.get_context_stats()
             message_text = result.message.get('content', [{}])[0].get('text', str(result.message))
             metrics_summary = result.metrics.get_summary()
             metrics_summary.update({
-                "context_managed": True,
+                "redwood_agent_enabled": True,
                 "context_stats": context_stats
             })
 
