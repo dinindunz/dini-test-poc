@@ -2,15 +2,16 @@
 Context Manager Package
 
 Intelligent context window management for long-running agent tasks.
+Like redwood tree rings: recent visible, old compressed into core.
 """
 
 from .context_manager import ContextManager, ActionRecord, ContextState
-from .context_aware_agent import ContextAwareAgent, create_context_aware_agent
+from .redwood_agent import RedwoodAgent, create_redwood_agent
 
 __all__ = [
     'ContextManager',
     'ActionRecord',
     'ContextState',
-    'ContextAwareAgent',
-    'create_context_aware_agent'
+    'RedwoodAgent',
+    'create_redwood_agent'
 ]

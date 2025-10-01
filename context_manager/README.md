@@ -1,4 +1,4 @@
-# Context Management System for Agentic Loops
+# Redwood Agent - Context Management System for Agentic Loops
 
 ## Overview
 
@@ -49,8 +49,9 @@ With context management:
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                   ContextAwareAgent                     │
+│                    RedwoodAgent                         │
 │  (Wrapper that adds context management to any agent)    │
+│  Like tree rings: recent visible, old compressed        │
 └────────────────────┬────────────────────────────────────┘
                      │
                      ▼
@@ -365,14 +366,14 @@ context = manager.get_context_for_agent()
 print(context)
 ```
 
-### With Context-Aware Agent
+### With Redwood Agent
 
 ```python
-from context_manager.context_aware_agent import create_context_aware_agent
+from context_manager.redwood_agent import create_redwood_agent
 
 # Wrap your agent
 base_agent = YourAgent()
-context_agent = create_context_aware_agent(
+redwood_agent = create_redwood_agent(
     base_agent,
     config={
         "max_working_memory": 12,
@@ -381,13 +382,13 @@ context_agent = create_context_aware_agent(
 )
 
 # Set goal
-context_agent.context_manager.set_goal(
+redwood_agent.context_manager.set_goal(
     "Build API endpoint",
     subtasks=["design schema", "implement route", "add tests"]
 )
 
 # Execute with automatic context management
-result = context_agent("Create a /login endpoint")
+result = redwood_agent("Create a /login endpoint")
 
 # Context is automatically managed:
 # - Actions logged
@@ -550,7 +551,7 @@ python -m context_manager.test_context_system
 Here's a complete example of using the system in a realistic scenario:
 
 ```python
-from context_manager.context_aware_agent import create_context_aware_agent
+from context_manager.redwood_agent import create_redwood_agent
 
 # Your base agent
 class CodeAgent:
@@ -560,7 +561,7 @@ class CodeAgent:
         return result
 
 # Wrap with context management
-agent = create_context_aware_agent(
+agent = create_redwood_agent(
     CodeAgent(),
     config={"max_working_memory": 12}
 )
@@ -841,11 +842,11 @@ ContextManager(max_working_memory: int = 10, max_context_tokens: int = 8000)
 - Persist/restore context state
 - JSON format
 
-### ContextAwareAgent
+### RedwoodAgent
 
 #### Constructor
 ```python
-ContextAwareAgent(base_agent, context_config: Dict = None)
+RedwoodAgent(base_agent, context_config: Dict = None)
 ```
 
 #### Methods
@@ -872,7 +873,7 @@ ContextAwareAgent(base_agent, context_config: Dict = None)
 
 ### Factory Function
 
-**create_context_aware_agent(base_agent, config=None) → ContextAwareAgent**
+**create_redwood_agent(base_agent, config=None) → RedwoodAgent**
 - Convenience function to create wrapped agent
 - Config keys: `max_working_memory`, `max_context_tokens`
 
@@ -899,5 +900,15 @@ This context management system is part of the dini-test-poc project.
 
 For issues or questions about the context management system, please refer to:
 - The test suite: `test_context_system.py`
-- Example usage in: `context_aware_agent.py` (bottom section)
+- Example usage in: `redwood_agent.py` (bottom section)
 - Code comments in: `context_manager.py`
+
+---
+
+## Why "Redwood"?
+
+Like the rings of a redwood tree:
+- **Recent rings** (outer layers) are visible and detailed - representing working memory
+- **Older rings** (inner layers) are compressed but preserve the essence - representing summarised history
+- **Core** (heartwood) contains the structural decisions that shaped the tree - representing the decision trail
+- The tree **grows** while maintaining its integrity and staying within its space

@@ -224,11 +224,11 @@ async def invoke_agent(request: InvokeRequest):
 
         if use_context_management:
             # Use context-aware agent
-            from context_manager.context_aware_agent import create_context_aware_agent
+            from context_manager.redwood_agent import create_redwood_agent
 
             if not hasattr(invoke_agent, '_context_agent'):
                 print("🧠 Initialising context-aware agent")
-                invoke_agent._context_agent = create_context_aware_agent(
+                invoke_agent._context_agent = create_redwood_agent(
                     agent,
                     {"max_working_memory": 12, "max_context_tokens": 6000}
                 )

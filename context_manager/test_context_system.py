@@ -7,7 +7,7 @@ Verify that context management works correctly for agentic loops.
 
 import time
 from context_manager.context_manager import ContextManager
-from context_manager.context_aware_agent import create_context_aware_agent
+from context_manager.redwood_agent import create_redwood_agent
 
 
 class MockAgent:
@@ -98,19 +98,19 @@ def test_context_compression():
     print("✅ Context compression working")
 
 
-def test_context_aware_agent():
-    """Test the full context-aware agent"""
-    print("\n🧪 Testing Context-Aware Agent")
+def test_redwood_agent():
+    """Test the full redwood agent"""
+    print("\n🧪 Testing Redwood Agent")
     print("-" * 40)
 
     mock_agent = MockAgent()
-    context_agent = create_context_aware_agent(mock_agent, {
+    redwood_agent = create_redwood_agent(mock_agent, {
         "max_working_memory": 8,
         "max_context_tokens": 2000
     })
 
     # Set a goal
-    context_agent.context_manager.set_goal(
+    redwood_agent.context_manager.set_goal(
         "Implement user authentication",
         ["analyse current setup", "design solution", "implement code", "test"]
     )
@@ -129,29 +129,29 @@ def test_context_aware_agent():
 
         # Set phase
         phases = ["analysis", "implementation", "debugging", "finalisation", "testing"]
-        context_agent.set_phase(phases[i])
+        redwood_agent.set_phase(phases[i])
 
         # Execute
-        result = context_agent(prompt)
+        result = redwood_agent(prompt)
 
         # Mark subtask complete
-        if i < len(context_agent.context_manager.state.goal_state.get("subtasks", [])):
-            subtask = context_agent.context_manager.state.goal_state["subtasks"][i]
-            context_agent.mark_subtask_complete(subtask)
+        if i < len(redwood_agent.context_manager.state.goal_state.get("subtasks", [])):
+            subtask = redwood_agent.context_manager.state.goal_state["subtasks"][i]
+            redwood_agent.mark_subtask_complete(subtask)
 
         # Check result
         assert hasattr(result, 'message'), "Should return proper result"
 
         # Check context stats
-        stats = context_agent.get_context_stats()
+        stats = redwood_agent.get_context_stats()
         print(f"Actions: {stats['total_actions']}, Memory: {stats['working_memory_size']}")
 
     # Final verification
-    final_stats = context_agent.get_context_stats()
+    final_stats = redwood_agent.get_context_stats()
     assert final_stats['total_actions'] > 10, "Should have recorded multiple actions"
     assert final_stats['iterations_completed'] == 5, "Should have completed 5 iterations"
 
-    print("✅ Context-aware agent working")
+    print("✅ Redwood agent working")
 
 
 def test_decision_tracking():
@@ -217,7 +217,7 @@ def run_all_tests():
         test_context_compression()
         test_decision_tracking()
         test_error_pattern_recognition()
-        test_context_aware_agent()
+        test_redwood_agent()
 
         print("\n🎉 All Tests Passed!")
         print("=" * 50)

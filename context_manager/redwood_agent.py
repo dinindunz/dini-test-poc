@@ -1,7 +1,8 @@
 """
-Context-Aware Agent Wrapper
+Redwood Agent Wrapper
 
 Integrates context management with agent execution for long-running tasks.
+Like tree rings: recent growth visible, old compressed into core.
 """
 
 import time
@@ -11,7 +12,7 @@ from .context_manager import ContextManager, ActionRecord
 from pathlib import Path
 
 
-class ContextAwareAgent:
+class RedwoodAgent:
     """Agent wrapper with intelligent context management"""
 
     def __init__(self, base_agent, context_config: Dict[str, Any] = None):
@@ -254,8 +255,8 @@ CURRENT CONTEXT:
 
 
 # Usage examples and testing functions
-def create_context_aware_agent(base_agent, config: Dict[str, Any] = None):
-    """Factory function to create context-aware agent"""
+def create_redwood_agent(base_agent, config: Dict[str, Any] = None):
+    """Factory function to create redwood agent"""
     default_config = {
         "max_working_memory": 12,
         "max_context_tokens": 8000
@@ -264,7 +265,7 @@ def create_context_aware_agent(base_agent, config: Dict[str, Any] = None):
     if config:
         default_config.update(config)
 
-    return ContextAwareAgent(base_agent, default_config)
+    return RedwoodAgent(base_agent, default_config)
 
 
 def demo_context_management(agent):
@@ -326,5 +327,5 @@ if __name__ == "__main__":
             })()
 
     mock_agent = MockAgent()
-    context_agent = create_context_aware_agent(mock_agent)
+    context_agent = create_redwood_agent(mock_agent)
     demo_context_management(context_agent)
