@@ -1,0 +1,111 @@
+{
+  "working_memory": [
+    {
+      "timestamp": 1759308982.530912,
+      "action_type": "user_prompt",
+      "content": "Test the authentication system",
+      "success": true,
+      "token_count": 5,
+      "importance": 0.5,
+      "compressed": false,
+      "metadata": {
+        "iteration": 5
+      }
+    },
+    {
+      "timestamp": 1759308982.531132,
+      "action_type": "reasoning",
+      "content": "Enhanced prompt with context. Original: 30 chars, Enhanced: 1414 chars",
+      "success": true,
+      "token_count": 13,
+      "importance": 0.7,
+      "compressed": false,
+      "metadata": {}
+    },
+    {
+      "timestamp": 1759308982.5313332,
+      "action_type": "agent_execution",
+      "content": "Agent executed successfully in 0.00s",
+      "success": true,
+      "token_count": 6,
+      "importance": 0.5,
+      "compressed": false,
+      "metadata": {
+        "execution_time": 3.0994415283203125e-05,
+        "iteration": 5
+      }
+    },
+    {
+      "timestamp": 1759308982.5314088,
+      "action_type": "agent_response",
+      "content": "Running tests to verify the implementation works correctly.",
+      "success": true,
+      "token_count": 10,
+      "importance": 0.5,
+      "compressed": false,
+      "metadata": {
+        "full_length": 59
+      }
+    },
+    {
+      "timestamp": 1759308982.531424,
+      "action_type": "tool_usage",
+      "content": "Made 2 tool calls in this iteration",
+      "success": true,
+      "token_count": 9,
+      "importance": 0.5,
+      "compressed": false,
+      "metadata": {
+        "total_tool_calls": 2,
+        "execution_time": 1.5,
+        "tokens_used": 250
+      }
+    }
+  ],
+  "short_term_summary": "[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: Performed 1 reasoning steps\n[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: Performed 1 reasoning steps\n[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: Performed 1 reasoning steps\n[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: Performed 1 reasoning steps\n[COMPRESSED 2 actions]: \n[COMPRESSED 2 actions]: ",
+  "long_term_memory": {},
+  "current_phase": "testing",
+  "goal_state": {
+    "main_goal": "Implement user authentication",
+    "subtasks": [
+      "analyse current setup",
+      "design solution",
+      "implement code",
+      "test"
+    ],
+    "completed_subtasks": [
+      {
+        "task": "analyse current setup",
+        "completed_at": 1759308982.5298612
+      },
+      {
+        "task": "design solution",
+        "completed_at": 1759308982.5303738
+      },
+      {
+        "task": "implement code",
+        "completed_at": 1759308982.530524
+      },
+      {
+        "task": "test",
+        "completed_at": 1759308982.530657
+      }
+    ],
+    "current_focus": "Implement user authentication",
+    "start_time": 1759308982.529077
+  },
+  "decision_trail": [],
+  "error_patterns": {},
+  "success_patterns": [],
+  "manager_stats": {
+    "total_actions": 35,
+    "working_memory_size": 5,
+    "current_tokens": 43,
+    "token_utilisation": 0.0215,
+    "current_phase": "testing",
+    "decisions_made": 0,
+    "error_patterns": 0,
+    "goal_progress": 4,
+    "compression_events": 15
+  }
+}

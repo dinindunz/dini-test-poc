@@ -6,7 +6,8 @@ Verify that context management works correctly for agentic loops.
 """
 
 import time
-from context_manager import ContextManager, create_context_aware_agent
+from context_manager.context_manager import ContextManager
+from context_manager.context_aware_agent import create_context_aware_agent
 
 
 class MockAgent:
@@ -30,14 +31,17 @@ class MockAgent:
 
         response_text = responses[min(self.call_count - 1, len(responses) - 1)]
 
+        # Capture call_count for use in lambda
+        call_count = self.call_count
+
         # Simulate agent result structure
         return type('Result', (), {
             'message': {'content': [{'text': response_text}]},
             'metrics': type('Metrics', (), {
-                'get_summary': lambda: {
+                'get_summary': lambda self: {
                     'total_tool_calls': 2,
                     'execution_time': 1.5,
-                    'tokens_used': 150 + (self.call_count * 20)
+                    'tokens_used': 150 + (call_count * 20)
                 }
             })()
         })()

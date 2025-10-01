@@ -1,0 +1,20 @@
+{
+  "error_message": "MockAgent.__call__.<locals>.<lambda>() takes 0 positional arguments but 1 was given",
+  "iteration": 1,
+  "context_state": "GOAL: {'main_goal': 'Implement user authentication', 'subtasks': ['analyse current setup', 'design solution', 'implement code', 'test'], 'completed_subtasks': [], 'current_focus': 'Implement user authentication', 'start_time': 1759308954.388708}\n\nPREVIOUS ACTIONS: [COMPRESSED 2 actions]: \n\nRECENT ACTIONS:\n[error] Agent execution failed: MockAgent.__call__.<locals>.<lambda>() takes 0 positional arguments but 1 was given\n[user_prompt] Start implementing user authentication\n[reasoning] Enhanced prompt with context. Original: 38 chars, Enhanced: 642 chars\n[agent_execution] Agent executed successfully in 0.00s\n[agent_response] I'll start by analysing the repository structure.",
+  "statistics": {
+    "total_actions": 7,
+    "working_memory_size": 5,
+    "current_tokens": 48,
+    "token_utilisation": 0.024,
+    "current_phase": "analysis",
+    "decisions_made": 0,
+    "error_patterns": 1,
+    "goal_progress": 0,
+    "compression_events": 1,
+    "session_duration": 0.00045490264892578125,
+    "iterations_completed": 1,
+    "context_saves": 1
+  },
+  "timestamp": "20251001_215554"
+}

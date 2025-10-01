@@ -1,0 +1,14 @@
+{
+  "total_actions": 35,
+  "working_memory_size": 5,
+  "current_tokens": 43,
+  "token_utilisation": 0.0215,
+  "current_phase": "testing",
+  "decisions_made": 0,
+  "error_patterns": 0,
+  "goal_progress": 4,
+  "compression_events": 15,
+  "session_duration": 0.0052280426025390625,
+  "iterations_completed": 5,
+  "context_saves": 4
+}

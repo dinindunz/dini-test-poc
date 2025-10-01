@@ -161,12 +161,6 @@ class ContextManager:
 
         print(f"📋 Analysis: {len(critical_actions)} critical, {len(recent_actions)} recent, {len(compressible_actions)} compressible")
 
-        # Create compressed summary of middle actions
-        if compressible_actions:
-            summary = self._create_action_summary(compressible_actions)
-            self.state.short_term_summary = summary
-            print(f"📝 Created summary of {len(compressible_actions)} actions ({len(summary)} chars)")
-
         # Keep critical + recent actions
         preserved_actions = []
         seen_actions = set()
@@ -183,8 +177,22 @@ class ContextManager:
             if action not in preserved_actions:
                 preserved_actions.append(action)
 
-        # Update working memory
-        self.state.working_memory = preserved_actions[-self.max_working_memory:]
+        # Update working memory and determine what's being dropped
+        new_working_memory = preserved_actions[-self.max_working_memory:]
+        dropped_actions = [a for a in self.state.working_memory if a not in new_working_memory]
+
+        # Create compressed summary of dropped or compressible actions
+        actions_to_summarise = compressible_actions if compressible_actions else dropped_actions
+        if actions_to_summarise:
+            summary = self._create_action_summary(actions_to_summarise)
+            # Append to existing summary if present
+            if self.state.short_term_summary:
+                self.state.short_term_summary += f"\n{summary}"
+            else:
+                self.state.short_term_summary = summary
+            print(f"📝 Created summary of {len(actions_to_summarise)} actions ({len(summary)} chars)")
+
+        self.state.working_memory = new_working_memory
         self._compression_count += 1
 
         final_count = len(self.state.working_memory)
