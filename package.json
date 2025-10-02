@@ -1,0 +1,41 @@
+{
+  "name": "terminal-mcp-server",
+  "version": "0.1.0",
+  "description": "MCP server for executing terminal commands",
+  "type": "module",
+  "main": "server.js",
+  "bin": {
+    "terminal-mcp-server": "./server.js"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "mcp",
+    "terminal",
+    "shell",
+    "command",
+    "execution"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^0.5.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/terminal-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/terminal-mcp-server/issues"
+  },
+  "homepage": "https://github.com/yourusername/terminal-mcp-server#readme"
+}
