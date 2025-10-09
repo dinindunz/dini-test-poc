@@ -78,21 +78,24 @@ class MultiModuleChunker:
             package_name = self._extract_package(content)
             imports = self._extract_imports(content)
             
-            # Find all classes
+            # Find all classes and records
             class_nodes = self._find_nodes_by_type(tree.root_node, 'class_declaration')
-            
-            for class_node in class_nodes:
+            record_nodes = self._find_nodes_by_type(tree.root_node, 'record_declaration')
+            all_type_nodes = class_nodes + record_nodes
+
+            for class_node in all_type_nodes:
                 class_name = self._get_identifier(class_node, 'identifier')
-                
+                node_type = 'record' if class_node.type == 'record_declaration' else 'class'
+
                 # Check class size - if small, chunk as whole class
                 class_content = content[class_node.start_byte:class_node.end_byte]
-                
+
                 if len(class_content) < 10000:  # ~300 lines
                     # Chunk entire class
                     self._add_chunk({
                         'content': class_content,
                         'full_content_with_imports': self._build_complete_content(imports, class_content),
-                        'type': 'class',
+                        'type': node_type,
                         'file_type': 'java',
                         'module': module_name,
                         'file_path': str(file_path.relative_to(self.root_dir)),
@@ -547,10 +550,10 @@ if __name__ == "__main__":
     chunker.print_statistics()
     
     # Save to file
-    chunker.save_chunks("../data/chunks_output.json")
-    
+    chunker.save_chunks("../chunks/chunks_output.json")
+
     # Save a sample for review
     sample_chunks = chunks[:10]
-    with open("../data/chunks_sample.json", 'w', encoding='utf-8') as f:
+    with open("../chunks/chunks_sample.json", 'w', encoding='utf-8') as f:
         json.dump(sample_chunks, f, indent=2, ensure_ascii=False)
-    print(f"✅ Saved 10 sample chunks to ../data/chunks_sample.json")
+    print(f"✅ Saved 10 sample chunks to ../chunks/chunks_sample.json")

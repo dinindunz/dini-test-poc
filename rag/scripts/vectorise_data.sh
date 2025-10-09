@@ -22,8 +22,8 @@ echo ""
 # --batch-size: Batch size for processing (default: 25)
 # --clear: Clear existing data before inserting
 
-python ../vectorise/vectorise_and_store.py \
-    --chunks-file ../data/chunks_output.json \
+python vectorise_and_store.py \
+    --chunks-file ../chunks/chunks_output.json \
     --model-id amazon.titan-embed-text-v2:0 \
     --table-name code_embeddings \
     --batch-size 25

@@ -1,8 +1,8 @@
 # 1. Run the chunker
-python ../chunk/multi_module_chunker.py ../../container/java17
+python multi_module_chunker.py ../../container/java17
 
 # 2. Review output
-cat ../data/chunks_sample.json | jq '.[0]'  # View first chunk
+cat ../chunks/chunks_sample.json | jq '.[0]'  # View first chunk
 
 # 3. Verify statistics
 # Should show something like:
