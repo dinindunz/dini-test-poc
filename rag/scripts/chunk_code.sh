@@ -1,5 +1,5 @@
 # 1. Run the chunker
-python multi_module_chunker.py ../../container/java17
+python multi_module_chunker.py ../java17
 
 # 2. Review output
 cat ../chunks/chunks_sample.json | jq '.[0]'  # View first chunk

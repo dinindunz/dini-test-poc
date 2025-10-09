@@ -539,7 +539,7 @@ if __name__ == "__main__":
     import sys
     
     # Usage: python multi_module_chunker.py /path/to/java17
-    root_directory = sys.argv[1] if len(sys.argv) > 1 else "../../container/java17"
+    root_directory = sys.argv[1] if len(sys.argv) > 1 else "../java17"
     
     print(f"🚀 Starting multi-module chunking for: {root_directory}")
     

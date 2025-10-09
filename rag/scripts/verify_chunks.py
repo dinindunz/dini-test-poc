@@ -42,12 +42,15 @@ def get_chunked_java_files(chunks_file: Path) -> Dict[str, List[Dict]]:
 
 def main():
     # Paths
-    if len(sys.argv) > 1:
-        root_dir = Path(sys.argv[1])
-    else:
-        root_dir = Path(__file__).parent.parent.parent / "container" / "java17"
+    # Get the rag directory (parent of scripts directory)
+    rag_dir = Path(__file__).resolve().parent.parent
 
-    chunks_file = Path(__file__).parent.parent / "chunks" / "chunks_output.json"
+    if len(sys.argv) > 1:
+        root_dir = Path(sys.argv[1]).resolve()
+    else:
+        root_dir = rag_dir / "java17"
+
+    chunks_file = rag_dir / "chunks" / "chunks_output.json"
 
     print("=" * 70)
     print("JAVA FILE CHUNK VERIFICATION")
