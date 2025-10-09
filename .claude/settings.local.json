@@ -5,7 +5,8 @@
       "Bash(pkill:*)",
       "Bash(netstat:*)",
       "Bash(lsof:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(chmod:*)"
     ],
     "deny": [],
     "ask": []

@@ -2,11 +2,15 @@
 PostgreSQL pgvector vector store implementation
 """
 import psycopg2
-from psycopg2.extras import execute_values
+from psycopg2.extras import execute_values, Json
 from typing import List, Dict, Optional, Tuple, Any
 from pgvector.psycopg2 import register_vector
 import numpy as np
-from .config import DatabaseConfig
+
+try:
+    from .config import DatabaseConfig
+except ImportError:
+    from config import DatabaseConfig
 
 
 class PgVectorStore:
@@ -87,7 +91,7 @@ class PgVectorStore:
                 VALUES (%s, %s, %s)
                 RETURNING id
                 """,
-                (content, np.array(embedding), metadata)
+                (content, np.array(embedding), Json(metadata))
             )
             record_id = cur.fetchone()[0]
             self.conn.commit()
@@ -107,9 +111,9 @@ class PgVectorStore:
             List of inserted record IDs
         """
         with self.conn.cursor() as cur:
-            # Convert embeddings to numpy arrays
+            # Convert embeddings to numpy arrays and metadata to JSON
             formatted_records = [
-                (content, np.array(embedding), metadata)
+                (content, np.array(embedding), Json(metadata))
                 for content, embedding, metadata in records
             ]
 

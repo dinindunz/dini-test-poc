@@ -15,3 +15,5 @@ fastapi
 psycopg2-binary
 pgvector
 openai
+boto3
+tqdm
