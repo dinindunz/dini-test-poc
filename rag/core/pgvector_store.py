@@ -136,7 +136,8 @@ class PgVectorStore:
         self,
         query_embedding: List[float],
         top_k: int = 5,
-        metadata_filter: Optional[Dict] = None
+        metadata_filter: Optional[Dict] = None,
+        verbose: bool = False
     ) -> List[Dict[str, Any]]:
         """
         Perform similarity search using cosine distance
@@ -145,6 +146,7 @@ class PgVectorStore:
             query_embedding: Query vector
             top_k: Number of results to return
             metadata_filter: Optional metadata filter (e.g., {"type": "document"})
+            verbose: Print SQL query for debugging
 
         Returns:
             List of matching records with similarity scores
@@ -152,7 +154,7 @@ class PgVectorStore:
         with self.conn.cursor() as cur:
             # Build query with optional metadata filter
             query = f"""
-                SELECT id, content, metadata,
+                SELECT id, content, metadata, embedding,
                        1 - (embedding <=> %s) as similarity
                 FROM {self.table_name}
             """
@@ -169,6 +171,24 @@ class PgVectorStore:
             query += f" ORDER BY embedding <=> %s LIMIT %s"
             params.extend([np.array(query_embedding), top_k])
 
+            if verbose:
+                print(f"\n{'='*70}")
+                print(f"🔎 SQL QUERY")
+                print(f"{'='*70}")
+                print(query)
+                print(f"\n📋 Query Parameters:")
+                print(f"  - Vector dimension: {len(query_embedding)}")
+                print(f"  - Top K: {top_k}")
+                if metadata_filter:
+                    print(f"  - Metadata filters: {metadata_filter}")
+                print(f"\n💡 Search Strategy:")
+                print(f"  - Semantic Search: Using cosine similarity (embedding <=> vector)")
+                print(f"  - Distance Operator: '<=' (cosine distance)")
+                print(f"  - Similarity Metric: 1 - cosine_distance (higher = more similar)")
+                if metadata_filter:
+                    print(f"  - Lexical Filter: JSONB metadata filtering on {list(metadata_filter.keys())}")
+                print(f"{'='*70}\n")
+
             cur.execute(query, params)
 
             results = []
@@ -177,7 +197,8 @@ class PgVectorStore:
                     "id": row[0],
                     "content": row[1],
                     "metadata": row[2],
-                    "similarity": float(row[3])
+                    "embedding": row[3].tolist() if row[3] is not None else [],
+                    "similarity": float(row[4])
                 })
 
             return results

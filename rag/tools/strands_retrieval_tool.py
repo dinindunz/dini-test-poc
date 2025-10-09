@@ -79,7 +79,8 @@ def retrieve_code_examples(
         results = vector_store.similarity_search(
             query_embedding=query_embedding,
             top_k=top_k,
-            metadata_filter=metadata_filter if metadata_filter else None
+            metadata_filter=metadata_filter if metadata_filter else None,
+            verbose=True
         )
         print(f"✅ Found {len(results)} results")
 
