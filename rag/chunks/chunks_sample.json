@@ -13,7 +13,9 @@
       "org.springframework.boot.SpringApplication",
       "org.springframework.boot.autoconfigure.SpringBootApplication"
     ],
-    "annotations": [],
+    "annotations": [
+      "@SpringBootApplication"
+    ],
     "line_start": 6,
     "line_end": 12,
     "chunk_id": "01_dini_java17-quickstart-helloworld_0",
@@ -34,7 +36,10 @@
       "lombok.extern.slf4j.Slf4j",
       "org.springframework.stereotype.Repository"
     ],
-    "annotations": [],
+    "annotations": [
+      "@Slf4j",
+      "@Repository"
+    ],
     "line_start": 7,
     "line_end": 15,
     "chunk_id": "01_dini_java17-quickstart-helloworld_1",
@@ -59,7 +64,12 @@
       "org.springframework.web.bind.annotation.RequestMapping",
       "org.springframework.web.bind.annotation.RestController"
     ],
-    "annotations": [],
+    "annotations": [
+      "@Slf4j",
+      "@RestController",
+      "@RequiredArgsConstructor",
+      "@RequestMapping(\"/api/hello\")"
+    ],
     "line_start": 11,
     "line_end": 24,
     "chunk_id": "01_dini_java17-quickstart-helloworld_2",
@@ -74,11 +84,13 @@
     "file_path": "01_dini_java17-quickstart-helloworld/src/main/java/com/example/hello/world/api/SampleResponse.java",
     "package": "com.example.hello.world.api",
     "class_name": "SampleResponse",
-    "layer": "other",
+    "layer": "dto",
     "imports": [
       "com.fasterxml.jackson.annotation.JsonInclude"
     ],
-    "annotations": [],
+    "annotations": [
+      "@JsonInclude(JsonInclude.Include.NON_NULL)"
+    ],
     "line_start": 5,
     "line_end": 11,
     "chunk_id": "01_dini_java17-quickstart-helloworld_3",
@@ -93,7 +105,7 @@
     "file_path": "01_dini_java17-quickstart-helloworld/src/main/java/com/example/hello/world/application/SampleService.java",
     "package": "com.example.hello.world.application",
     "class_name": "SampleService",
-    "layer": "other",
+    "layer": "service",
     "imports": [
       "com.example.hello.world.api.SampleResponse",
       "com.example.hello.world.repository.sample.SampleRepository",
@@ -101,7 +113,11 @@
       "lombok.extern.slf4j.Slf4j",
       "org.springframework.stereotype.Service"
     ],
-    "annotations": [],
+    "annotations": [
+      "@Slf4j",
+      "@Service",
+      "@RequiredArgsConstructor"
+    ],
     "line_start": 9,
     "line_end": 19,
     "chunk_id": "01_dini_java17-quickstart-helloworld_4",

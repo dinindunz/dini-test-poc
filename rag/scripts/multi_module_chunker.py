@@ -315,7 +315,7 @@ class MultiModuleChunker:
         path_str = str(file_path).lower()
         if '/controller/' in path_str:
             return 'controller'
-        elif '/service/' in path_str:
+        elif '/service/' in path_str or '/application/' in path_str: # /application/ path detection for service layer (common Spring Boot pattern)
             return 'service'
         elif '/config/' in path_str:
             return 'config'
@@ -325,7 +325,7 @@ class MultiModuleChunker:
             return 'model'
         elif '/repository/' in path_str:
             return 'repository'
-        elif '/dto/' in path_str:
+        elif '/dto/' in path_str or '/api/' in path_str: # /api/ path detection for DTO layer (where API contracts/DTOs are typically placed)
             return 'dto'
         return 'other'
     
@@ -360,17 +360,19 @@ class MultiModuleChunker:
         return 'unknown'
     
     def _extract_annotations(self, node, content: str) -> List[str]:
-        """Extract annotations from a node"""
+        """Extract annotations from a node using AST"""
         annotations = []
-        # Look backwards from node for annotations
-        lines_before = content[:node.start_byte].split('\n')
-        for line in reversed(lines_before[-10:]):  # Check last 10 lines
-            line = line.strip()
-            if line.startswith('@'):
-                annotations.append(line)
-            elif line and not line.startswith('//'):
-                break
-        return list(reversed(annotations))
+
+        # Check if node has a 'modifiers' child (contains annotations)
+        for child in node.children:
+            if child.type == 'modifiers':
+                # Find all marker_annotation and annotation nodes
+                for modifier_child in child.children:
+                    if modifier_child.type in ['marker_annotation', 'annotation']:
+                        ann_text = content[modifier_child.start_byte:modifier_child.end_byte]
+                        annotations.append(ann_text)
+
+        return annotations
     
     def _is_rest_endpoint(self, node, content: str) -> bool:
         """Check if method is a REST endpoint"""
