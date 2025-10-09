@@ -6,7 +6,7 @@ import re
 from pathlib import Path
 from typing import List, Dict
 from tree_sitter import Language, Parser
-import tree_sitter_java as tsjava
+from tree_sitter_languages import get_language
 
 class MultiModuleChunker:
     def __init__(self, root_dir: str):
@@ -15,14 +15,16 @@ class MultiModuleChunker:
         self.java_parser = self._init_java_parser()
         
     def _init_java_parser(self):
-        JAVA_LANGUAGE = Language(tsjava.language())
-        return Parser(JAVA_LANGUAGE)
+        JAVA_LANGUAGE = get_language('java')
+        parser = Parser()
+        parser.set_language(JAVA_LANGUAGE)
+        return parser
     
     def process_all_modules(self):
-        """Process all nabserv modules"""
+        """Process all dini modules"""
         # Find all module directories
-        modules = [d for d in self.root_dir.glob("*_nabserv_*") if d.is_dir()]
-        
+        modules = [d for d in self.root_dir.glob("*_dini_*") if d.is_dir()]
+
         print(f"Found {len(modules)} modules to process:")
         for module in modules:
             print(f"  - {module.name}")
@@ -534,7 +536,7 @@ if __name__ == "__main__":
     import sys
     
     # Usage: python multi_module_chunker.py /path/to/java17
-    root_directory = sys.argv[1] if len(sys.argv) > 1 else "./java17"
+    root_directory = sys.argv[1] if len(sys.argv) > 1 else "../container/java17"
     
     print(f"🚀 Starting multi-module chunking for: {root_directory}")
     

@@ -1,0 +1,57 @@
+swagger: '2.0'
+info:
+  title: Hello World API
+  description: A simple Hello World quickstart application demonstrating RESTful API design
+  version: 1.0.0
+
+basePath: /api
+
+schemes:
+  - https
+  - http
+
+consumes:
+  - application/json
+
+produces:
+  - application/json
+
+paths:
+  /hello:
+    get:
+      summary: Get Hello World message
+      description: Returns a simple "Hello World" message
+      operationId: getHelloWorld
+      tags:
+        - Hello
+      responses:
+        200:
+          description: Successful response with hello world message
+          schema:
+            $ref: '#/definitions/SampleResponse'
+        500:
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+definitions:
+  SampleResponse:
+    type: object
+    properties:
+      message:
+        type: string
+        description: The hello world message
+        example: "Hello World!"
+    required:
+      - message
+
+  ErrorResponse:
+    type: object
+    properties:
+      error:
+        type: string
+        description: Error message
+      timestamp:
+        type: string
+        format: date-time
+        description: Time when error occurred

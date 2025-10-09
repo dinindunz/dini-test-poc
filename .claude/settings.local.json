@@ -4,7 +4,8 @@
       "Bash(python3:*)",
       "Bash(pkill:*)",
       "Bash(netstat:*)",
-      "Bash(lsof:*)"
+      "Bash(lsof:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": [],
     "ask": []

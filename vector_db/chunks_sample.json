@@ -1,0 +1,187 @@
+[
+  {
+    "content": "@SpringBootApplication\npublic class Application {\n\n    public static void main(String[] args) {\n        SpringApplication.run(Application.class, args);\n    }\n}",
+    "full_content_with_imports": "import org.springframework.boot.SpringApplication;\nimport org.springframework.boot.autoconfigure.SpringBootApplication;\n\n@SpringBootApplication\npublic class Application {\n\n    public static void main(String[] args) {\n        SpringApplication.run(Application.class, args);\n    }\n}",
+    "type": "class",
+    "file_type": "java",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/src/main/java/com/example/hello/world/Application.java",
+    "package": "com.example.hello.world",
+    "class_name": "Application",
+    "layer": "other",
+    "imports": [
+      "org.springframework.boot.SpringApplication",
+      "org.springframework.boot.autoconfigure.SpringBootApplication"
+    ],
+    "annotations": [],
+    "line_start": 6,
+    "line_end": 12,
+    "chunk_id": "01_dini_java17-quickstart-helloworld_0",
+    "char_count": 159
+  },
+  {
+    "content": "@Slf4j\n@Repository\npublic class SampleRepository {\n\n    public SampleResponse getHelloWorld() {\n        log.debug(\"Fetching hello world message\");\n        return new SampleResponse(\"Hello World!\");\n    }\n}",
+    "full_content_with_imports": "import com.example.hello.world.api.SampleResponse;\nimport lombok.extern.slf4j.Slf4j;\nimport org.springframework.stereotype.Repository;\n\n@Slf4j\n@Repository\npublic class SampleRepository {\n\n    public SampleResponse getHelloWorld() {\n        log.debug(\"Fetching hello world message\");\n        return new SampleResponse(\"Hello World!\");\n    }\n}",
+    "type": "class",
+    "file_type": "java",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/src/main/java/com/example/hello/world/repository/sample/SampleRepository.java",
+    "package": "com.example.hello.world.repository.sample",
+    "class_name": "SampleRepository",
+    "layer": "repository",
+    "imports": [
+      "com.example.hello.world.api.SampleResponse",
+      "lombok.extern.slf4j.Slf4j",
+      "org.springframework.stereotype.Repository"
+    ],
+    "annotations": [],
+    "line_start": 7,
+    "line_end": 15,
+    "chunk_id": "01_dini_java17-quickstart-helloworld_1",
+    "char_count": 205
+  },
+  {
+    "content": "@Slf4j\n@RestController\n@RequiredArgsConstructor\n@RequestMapping(\"/api/hello\")\npublic class SampleController {\n\n    private final SampleService sampleService;\n\n    @GetMapping\n    public SampleResponse getHelloWorld() {\n        log.info(\"Received request for hello world\");\n        return sampleService.getHelloWorld();\n    }\n}",
+    "full_content_with_imports": "import com.example.hello.world.api.SampleResponse;\nimport com.example.hello.world.application.SampleService;\nimport lombok.RequiredArgsConstructor;\nimport lombok.extern.slf4j.Slf4j;\nimport org.springframework.web.bind.annotation.GetMapping;\nimport org.springframework.web.bind.annotation.RequestMapping;\nimport org.springframework.web.bind.annotation.RestController;\n\n@Slf4j\n@RestController\n@RequiredArgsConstructor\n@RequestMapping(\"/api/hello\")\npublic class SampleController {\n\n    private final SampleService sampleService;\n\n    @GetMapping\n    public SampleResponse getHelloWorld() {\n        log.info(\"Received request for hello world\");\n        return sampleService.getHelloWorld();\n    }\n}",
+    "type": "class",
+    "file_type": "java",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/src/main/java/com/example/hello/world/controller/SampleController.java",
+    "package": "com.example.hello.world.controller",
+    "class_name": "SampleController",
+    "layer": "controller",
+    "imports": [
+      "com.example.hello.world.api.SampleResponse",
+      "com.example.hello.world.application.SampleService",
+      "lombok.RequiredArgsConstructor",
+      "lombok.extern.slf4j.Slf4j",
+      "org.springframework.web.bind.annotation.GetMapping",
+      "org.springframework.web.bind.annotation.RequestMapping",
+      "org.springframework.web.bind.annotation.RestController"
+    ],
+    "annotations": [],
+    "line_start": 11,
+    "line_end": 24,
+    "chunk_id": "01_dini_java17-quickstart-helloworld_2",
+    "char_count": 326
+  },
+  {
+    "content": "@Slf4j\n@Service\n@RequiredArgsConstructor\npublic class SampleService {\n\n    private final SampleRepository sampleRepository;\n\n    public SampleResponse getHelloWorld() {\n        return sampleRepository.getHelloWorld();\n    }\n}",
+    "full_content_with_imports": "import com.example.hello.world.api.SampleResponse;\nimport com.example.hello.world.repository.sample.SampleRepository;\nimport lombok.RequiredArgsConstructor;\nimport lombok.extern.slf4j.Slf4j;\nimport org.springframework.stereotype.Service;\n\n@Slf4j\n@Service\n@RequiredArgsConstructor\npublic class SampleService {\n\n    private final SampleRepository sampleRepository;\n\n    public SampleResponse getHelloWorld() {\n        return sampleRepository.getHelloWorld();\n    }\n}",
+    "type": "class",
+    "file_type": "java",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/src/main/java/com/example/hello/world/application/SampleService.java",
+    "package": "com.example.hello.world.application",
+    "class_name": "SampleService",
+    "layer": "other",
+    "imports": [
+      "com.example.hello.world.api.SampleResponse",
+      "com.example.hello.world.repository.sample.SampleRepository",
+      "lombok.RequiredArgsConstructor",
+      "lombok.extern.slf4j.Slf4j",
+      "org.springframework.stereotype.Service"
+    ],
+    "annotations": [],
+    "line_start": 9,
+    "line_end": 19,
+    "chunk_id": "01_dini_java17-quickstart-helloworld_3",
+    "char_count": 225
+  },
+  {
+    "content": "info:\n  description: A simple Hello World quickstart application demonstrating RESTful API\n    design\n  title: Hello World API\n  version: 1.0.0\n",
+    "type": "api_info",
+    "file_type": "swagger",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/src/main/api/api.swagger.yaml",
+    "api_title": "Hello World API",
+    "api_version": "1.0.0",
+    "description": "A simple Hello World quickstart application demonstrating RESTful API design",
+    "chunk_id": "01_dini_java17-quickstart-helloworld_4",
+    "char_count": 144
+  },
+  {
+    "content": "method: get\noperation:\n  description: Returns a simple \"Hello World\" message\n  operationId: getHelloWorld\n  responses:\n    200:\n      description: Successful response with hello world message\n      schema:\n        $ref: '#/definitions/SampleResponse'\n    500:\n      description: Internal server error\n      schema:\n        $ref: '#/definitions/ErrorResponse'\n  summary: Get Hello World message\n  tags:\n  - Hello\npath: /hello\nschemas:\n  ErrorResponse:\n    properties:\n      error:\n        description: Error message\n        type: string\n      timestamp:\n        description: Time when error occurred\n        format: date-time\n        type: string\n    type: object\n  SampleResponse:\n    properties:\n      message:\n        description: The hello world message\n        example: Hello World!\n        type: string\n    required:\n    - message\n    type: object\n",
+    "type": "api_endpoint",
+    "file_type": "swagger",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/src/main/api/api.swagger.yaml",
+    "http_method": "GET",
+    "api_path": "/hello",
+    "operation_id": "getHelloWorld",
+    "summary": "Get Hello World message",
+    "description": "Returns a simple \"Hello World\" message",
+    "tags": [
+      "Hello"
+    ],
+    "parameters": [],
+    "request_body": false,
+    "responses": [
+      200,
+      500
+    ],
+    "chunk_id": "01_dini_java17-quickstart-helloworld_5",
+    "char_count": 853
+  },
+  {
+    "content": "SampleResponse:\n  properties:\n    message:\n      description: The hello world message\n      example: Hello World!\n      type: string\n  required:\n  - message\n  type: object\n",
+    "type": "api_schema",
+    "file_type": "swagger",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/src/main/api/api.swagger.yaml",
+    "schema_name": "SampleResponse",
+    "properties": [
+      "message"
+    ],
+    "required_fields": [
+      "message"
+    ],
+    "chunk_id": "01_dini_java17-quickstart-helloworld_6",
+    "char_count": 172
+  },
+  {
+    "content": "ErrorResponse:\n  properties:\n    error:\n      description: Error message\n      type: string\n    timestamp:\n      description: Time when error occurred\n      format: date-time\n      type: string\n  type: object\n",
+    "type": "api_schema",
+    "file_type": "swagger",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/src/main/api/api.swagger.yaml",
+    "schema_name": "ErrorResponse",
+    "properties": [
+      "error",
+      "timestamp"
+    ],
+    "required_fields": [],
+    "chunk_id": "01_dini_java17-quickstart-helloworld_7",
+    "char_count": 209
+  },
+  {
+    "content": "# Hello World Quickstart\n\nA simple Spring Boot quickstart application demonstrating RESTful API development with a clean layered architecture.\n\n---\n\n",
+    "type": "documentation",
+    "file_type": "markdown",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/README.md",
+    "document_name": "README",
+    "heading": "Hello World Quickstart",
+    "heading_level": 1,
+    "section_index": 0,
+    "contains_code": false,
+    "word_count": 20,
+    "chunk_id": "01_dini_java17-quickstart-helloworld_8",
+    "char_count": 149
+  },
+  {
+    "content": "## What you will build\n\nThis quickstart provides the basics of building a Spring Boot application. The key topics covered include:\n\n- Starting the application and sending your first request\n- The simple architecture that makes up all applications: Controllers, Services & Repositories\n- How to package the application\n\n---\n\n",
+    "type": "documentation",
+    "file_type": "markdown",
+    "module": "01_dini_java17-quickstart-helloworld",
+    "file_path": "01_dini_java17-quickstart-helloworld/README.md",
+    "document_name": "README",
+    "heading": "What you will build",
+    "heading_level": 2,
+    "section_index": 1,
+    "contains_code": false,
+    "word_count": 50,
+    "chunk_id": "01_dini_java17-quickstart-helloworld_9",
+    "char_count": 324
+  }
+]
