@@ -20,7 +20,9 @@ def retrieve_code_examples(
     top_k: int = 5,
     file_type: Optional[str] = None,
     module: Optional[str] = None,
-    layer: Optional[str] = None
+    layer: Optional[str] = None,
+    class_name: Optional[str] = None,
+    http_method: Optional[str] = None
 ) -> str:
     """
     Search for relevant code examples from the vectorised codebase.
@@ -34,7 +36,9 @@ def retrieve_code_examples(
         top_k (int): Number of examples to retrieve (default: 5, recommended range: 3-10)
         file_type (Optional[str]): Filter by file type - "java", "gradle", "swagger", or "markdown"
         module (Optional[str]): Filter by specific module name
-        layer (Optional[str]): Filter by code layer - "controller", "service", "repository", or "api"
+        layer (Optional[str]): Filter by code layer - "controller", "service", "repository", or "dto"
+        class_name (Optional[str]): Filter by specific class name (e.g., "SampleController")
+        http_method (Optional[str]): Filter by HTTP method - "GET", "POST", "PUT", "DELETE", etc.
 
     Returns:
         str: Formatted code examples with file paths, metadata, and relevance scores
@@ -45,8 +49,8 @@ def retrieve_code_examples(
         print(f"{'='*70}")
         print(f"📝 Query: {query}")
         print(f"🔢 Top K: {top_k}")
-        if file_type or module or layer:
-            print(f"🔧 Filters: file_type={file_type}, module={module}, layer={layer}")
+        if file_type or module or layer or class_name or http_method:
+            print(f"🔧 Filters: file_type={file_type}, module={module}, layer={layer}, class_name={class_name}, http_method={http_method}")
 
         # Initialise retriever components
         print(f"\n⚙️  Initialising components...")
@@ -70,6 +74,10 @@ def retrieve_code_examples(
             metadata_filter['module'] = module
         if layer:
             metadata_filter['layer'] = layer
+        if class_name:
+            metadata_filter['class_name'] = class_name
+        if http_method:
+            metadata_filter['http_method'] = http_method
 
         if metadata_filter:
             print(f"\n🔍 Applying metadata filters: {metadata_filter}")

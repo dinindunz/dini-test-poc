@@ -73,6 +73,30 @@ def prepare_chunk_content(chunk: Dict) -> str:
     if 'type' in chunk:
         parts.append(f"Type: {chunk['type']}")
 
+    # Add layer information (important for Spring Boot architecture)
+    if 'layer' in chunk:
+        parts.append(f"Layer: {chunk['layer']}")
+
+    # Add Java-specific context
+    if 'class_name' in chunk:
+        parts.append(f"Class: {chunk['class_name']}")
+    if 'package' in chunk:
+        parts.append(f"Package: {chunk['package']}")
+    if 'annotations' in chunk and chunk['annotations']:
+        parts.append(f"Annotations: {', '.join(chunk['annotations'])}")
+
+    # Add API-specific context
+    if 'http_method' in chunk:
+        parts.append(f"HTTP Method: {chunk['http_method']}")
+    if 'api_path' in chunk:
+        parts.append(f"API Path: {chunk['api_path']}")
+    if 'operation_id' in chunk:
+        parts.append(f"Operation: {chunk['operation_id']}")
+
+    # Add documentation context
+    if 'heading' in chunk:
+        parts.append(f"Heading: {chunk['heading']}")
+
     # Add main content
     if 'content' in chunk:
         parts.append(chunk['content'])
@@ -97,19 +121,47 @@ def prepare_chunk_metadata(chunk: Dict) -> Dict:
     metadata = {}
 
     # Core fields
-    for field in ['module', 'file_path', 'file_type', 'type', 'name', 'language']:
+    for field in ['module', 'file_path', 'file_type', 'type', 'name', 'language', 'layer', 'chunk_id']:
         if field in chunk:
             metadata[field] = chunk[field]
 
     # Location information
-    if 'start_line' in chunk:
-        metadata['start_line'] = chunk['start_line']
-    if 'end_line' in chunk:
-        metadata['end_line'] = chunk['end_line']
+    if 'line_start' in chunk:
+        metadata['line_start'] = chunk['line_start']
+    if 'line_end' in chunk:
+        metadata['line_end'] = chunk['line_end']
 
-    # Additional context
+    # Java-specific fields
     if 'package' in chunk:
         metadata['package'] = chunk['package']
+    if 'class_name' in chunk:
+        metadata['class_name'] = chunk['class_name']
+    if 'annotations' in chunk:
+        metadata['annotations'] = chunk['annotations']  # Store as JSONB array
+
+    # API/Swagger-specific fields
+    if 'http_method' in chunk:
+        metadata['http_method'] = chunk['http_method']
+    if 'api_path' in chunk:
+        metadata['api_path'] = chunk['api_path']
+    if 'operation_id' in chunk:
+        metadata['operation_id'] = chunk['operation_id']
+    if 'schema_name' in chunk:
+        metadata['schema_name'] = chunk['schema_name']
+    if 'api_title' in chunk:
+        metadata['api_title'] = chunk['api_title']
+    if 'api_version' in chunk:
+        metadata['api_version'] = chunk['api_version']
+    if 'tags' in chunk:
+        metadata['tags'] = chunk['tags']  # Store as JSONB array
+
+    # Documentation-specific fields
+    if 'document_name' in chunk:
+        metadata['document_name'] = chunk['document_name']
+    if 'heading' in chunk:
+        metadata['heading'] = chunk['heading']
+    if 'heading_level' in chunk:
+        metadata['heading_level'] = chunk['heading_level']
 
     return metadata
 
