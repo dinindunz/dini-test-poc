@@ -536,7 +536,7 @@ if __name__ == "__main__":
     import sys
     
     # Usage: python multi_module_chunker.py /path/to/java17
-    root_directory = sys.argv[1] if len(sys.argv) > 1 else "../container/java17"
+    root_directory = sys.argv[1] if len(sys.argv) > 1 else "../../container/java17"
     
     print(f"🚀 Starting multi-module chunking for: {root_directory}")
     
@@ -547,10 +547,10 @@ if __name__ == "__main__":
     chunker.print_statistics()
     
     # Save to file
-    chunker.save_chunks("data/chunks_output.json")
+    chunker.save_chunks("../data/chunks_output.json")
     
     # Save a sample for review
     sample_chunks = chunks[:10]
-    with open("data/chunks_sample.json", 'w', encoding='utf-8') as f:
+    with open("../data/chunks_sample.json", 'w', encoding='utf-8') as f:
         json.dump(sample_chunks, f, indent=2, ensure_ascii=False)
-    print(f"✅ Saved 10 sample chunks to data/chunks_sample.json")
+    print(f"✅ Saved 10 sample chunks to ../data/chunks_sample.json")

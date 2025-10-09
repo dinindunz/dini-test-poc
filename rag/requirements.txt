@@ -1,8 +1,8 @@
 tree-sitter
 tree-sitter-languages
 pyyaml
-strands-agents
-strands-agents-tools
+# strands-agents
+# strands-agents-tools
 boto3
 tqdm
 psycopg2-binary
