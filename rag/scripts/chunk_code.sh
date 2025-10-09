@@ -1,13 +1,10 @@
-# 1. Install dependencies
-pip install tree-sitter tree-sitter-languages pyyaml
+# 1. Run the chunker
+python ../chunk/multi_module_chunker.py ../../container/java17
 
-# 2. Run the chunker
-python ../chunking/multi_module_chunker.py ../../container/java17
-
-# 3. Review output
+# 2. Review output
 cat ../data/chunks_sample.json | jq '.[0]'  # View first chunk
 
-# 4. Verify statistics
+# 3. Verify statistics
 # Should show something like:
 # ============================================================
 # Processing module: 01_dini_java17-quickstart-helloworld

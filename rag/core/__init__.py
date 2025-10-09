@@ -2,7 +2,6 @@
 Core utilities for vector database operations
 """
 from .config import DatabaseConfig
-from .embeddings import EmbeddingGenerator
 from .bedrock_embeddings import BedrockEmbeddingGenerator
 from .pgvector_store import PgVectorStore
 

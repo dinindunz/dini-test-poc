@@ -18,35 +18,35 @@ from tools.strands_retrieval_tool import retrieve_code_examples
 agent = Agent(tools=[retrieve_code_examples])
 
 
-# Example 1: Simple query
-print("=" * 60)
-print("Example 1: Generate a REST controller")
-print("=" * 60)
+# # Example 1: Simple query
+# print("=" * 60)
+# print("Example 1: Generate a REST controller")
+# print("=" * 60)
 
-message1 = """
-I need to create a Spring Boot REST controller for managing users.
-Can you show me an example and generate the code?
-"""
+# message1 = """
+# I need to create a Spring Boot REST controller for managing users.
+# Can you show me an example and generate the code?
+# """
 
-response1 = agent(message1)
-print(response1)
+# response1 = agent(message1)
+# print(response1)
 
 
-# Example 2: Multiple requests
-print("\n" + "=" * 60)
-print("Example 2: Multiple questions")
-print("=" * 60)
+# # Example 2: Multiple requests
+# print("\n" + "=" * 60)
+# print("Example 2: Multiple questions")
+# print("=" * 60)
 
-message2 = """
-I have 3 requests:
+# message2 = """
+# I have 3 requests:
 
-1. Show me how to structure a Spring Boot application
-2. Give me an example of a service layer class
-3. Generate a Gradle build configuration
-"""
+# 1. Show me how to structure a Spring Boot application
+# 2. Give me an example of a service layer class
+# 3. Generate a Gradle build configuration
+# """
 
-response2 = agent(message2)
-print(response2)
+# response2 = agent(message2)
+# print(response2)
 
 
 # Example 3: Specific filters
