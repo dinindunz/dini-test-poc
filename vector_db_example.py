@@ -1,7 +1,7 @@
 """
 Example usage of PostgreSQL pgvector solution
 """
-from vector_db import DatabaseConfig, PgVectorStore, EmbeddingGenerator
+from rag import DatabaseConfig, PgVectorStore, EmbeddingGenerator
 
 
 def main():

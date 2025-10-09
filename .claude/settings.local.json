@@ -6,7 +6,8 @@
       "Bash(netstat:*)",
       "Bash(lsof:*)",
       "Bash(mkdir:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(tree:*)"
     ],
     "deny": [],
     "ask": []

@@ -27,7 +27,7 @@ echo ""
 # --clear: Clear existing data before inserting
 
 python vectorise_and_store.py \
-    --chunks-file chunks_output.json \
+    --chunks-file ../data/chunks_output.json \
     --model-id amazon.titan-embed-text-v2:0 \
     --table-name code_embeddings \
     --batch-size 25

@@ -15,17 +15,17 @@ from tqdm import tqdm
 
 try:
     # Try relative imports (when run as module)
-    from .bedrock_embeddings import BedrockEmbeddingGenerator
-    from .pgvector_store import PgVectorStore
-    from .config import DatabaseConfig
+    from ..core.bedrock_embeddings import BedrockEmbeddingGenerator
+    from ..core.pgvector_store import PgVectorStore
+    from ..core.config import DatabaseConfig
 except ImportError:
     # Fall back to direct imports (when run as script)
     import sys
     from pathlib import Path
-    sys.path.insert(0, str(Path(__file__).parent))
-    from bedrock_embeddings import BedrockEmbeddingGenerator
-    from pgvector_store import PgVectorStore
-    from config import DatabaseConfig
+    sys.path.insert(0, str(Path(__file__).parent.parent))
+    from core.bedrock_embeddings import BedrockEmbeddingGenerator
+    from core.pgvector_store import PgVectorStore
+    from core.config import DatabaseConfig
 
 
 def load_chunks(chunks_file: Path) -> List[Dict]:

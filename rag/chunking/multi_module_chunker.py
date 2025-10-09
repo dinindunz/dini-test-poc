@@ -547,10 +547,10 @@ if __name__ == "__main__":
     chunker.print_statistics()
     
     # Save to file
-    chunker.save_chunks("chunks_output.json")
+    chunker.save_chunks("data/chunks_output.json")
     
     # Save a sample for review
     sample_chunks = chunks[:10]
-    with open("chunks_sample.json", 'w', encoding='utf-8') as f:
+    with open("data/chunks_sample.json", 'w', encoding='utf-8') as f:
         json.dump(sample_chunks, f, indent=2, ensure_ascii=False)
-    print(f"✅ Saved 10 sample chunks to chunks_sample.json")
+    print(f"✅ Saved 10 sample chunks to data/chunks_sample.json")

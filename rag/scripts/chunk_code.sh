@@ -2,10 +2,10 @@
 pip install tree-sitter tree-sitter-languages pyyaml
 
 # 2. Run the chunker
-python multi_module_chunker.py ../container/java17
+python ../chunking/multi_module_chunker.py ../../container/java17
 
 # 3. Review output
-cat chunks_sample.json | jq '.[0]'  # View first chunk
+cat ../data/chunks_sample.json | jq '.[0]'  # View first chunk
 
 # 4. Verify statistics
 # Should show something like:
