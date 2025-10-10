@@ -1,7 +1,7 @@
 
-> explain how an agent searches for content for a user query? Im not clear how embedding and metadata and context columns used here 
+> Explain how an agent searches for content for a user query.
 
-⏺ Great question! Let me explain the complete workflow of how an agent uses embeddings, metadata, and content to answer queries.
+⏺ An agent searches by converting the user query into an embedding vector and performing semantic similarity search against stored code embeddings. Let me explain the complete workflow:
 
   🔍 How Vector Search Works
 
@@ -183,9 +183,9 @@
 
 
 ====================================================================================================================================
-> what is the role of metadata here. only content is vectorised
+> What is the role of metadata here? Only content is vectorised.
 
-⏺ Excellent observation! You're absolutely right - only content is vectorised. Let me clarify the distinct roles:
+⏺ Metadata serves as structured filters for pre-filtering and post-filtering search results, while only content gets vectorised for semantic similarity. Here's the distinct role of each:
 
   🎯 Clear Separation of Concerns
 
@@ -355,10 +355,9 @@
 
 
 ====================================================================================================================================
-> so far we have vectorised only 01_dini_java17-quickstart-helloworld. if I ask in prompt like generate the code for java hello world springboot 
-application, would all chunks will be fsent to the LLM as per the current way we vectorised this? 
+> Explain how does the vector search determine which code chunks to send to the LLM? 
 
-⏺ No! Only the most relevant chunks will be sent to the LLM, not all 29 chunks. Let me explain:
+⏺ Vector search determines which chunks to send by calculating cosine similarity between the query embedding and all chunk embeddings, then returning only the top K most relevant results (e.g., top 5). Let me explain:
 
   🎯 How Vector Search Works
 
@@ -522,13 +521,9 @@ application, would all chunks will be fsent to the LLM as per the current way we
 
 
 ====================================================================================================================================
-> I can see you updated both prepare_chunk_metadata and prepare_chunk_content. I get why you updated prepare_chunk_metadata because we were enriching 
-metadata fiter. But adding all these into prepare_chunk_content they also getting vectorised. previous it had only type and content. I dont want you 
-to agree or disagree with me. I just want to know the best and right approach when vectorising code bases 
-  ⎿  ⧉ Selected 1 lines from scripts/vectorise_and_store.py in Visual Studio Code
-  ⎿  Found 1 new diagnostic issue in 1 file (ctrl-o to expand)
+> When vectorising code, should rich metadata (annotations, class names, layers) be included in the embedded content, or only stored as filterable metadata? What are the tradeoffs of each approach?
 
-⏺ Excellent question! This is a critical design decision in RAG systems. Let me explain the tradeoffs:
+⏺ Rich metadata (annotations, class names, layers) should be included in the embedded content for better semantic search, while also being stored as filterable metadata for hybrid search. This is the industry best practice for code RAG systems. Let me explain the tradeoffs:
 
   Two Approaches to Code Vectorisation
 
@@ -684,280 +679,9 @@ to agree or disagree with me. I just want to know the best and right approach wh
 
 
 ====================================================================================================================================
-> since now we have updated chunking script, we have new chunks. how can I safely revectorise and store them in pg database. do i have to truncate the table and reload it all?
+> Does tree-sitter work with source code text or compiled binaries? Explain the input format.
 
-⏺ Good question! You have a few options for safely re-vectorising. Let me show you the safest approach:
-
-  ## Option 1: Clear and Reload (Recommended for Complete Refresh)
-
-  The vectorisation script already has a --clear flag that safely truncates and reloads:
-
-  ```bash
-  cd /Users/dinindu/Projects/GitHub/dini-test-poc/rag
-
-  # Using the shell script (recommended)
-  ./scripts/vectorise_data.sh
-
-  # Or manually with Python
-  python3 scripts/vectorise_and_store.py \
-    --chunks-file chunks/chunks_output.json \
-    --clear
-  ```
-
-  What happens:
-  1. Script runs DELETE FROM code_embeddings to clear all existing data
-  2. Re-generates embeddings for all chunks
-  3. Inserts all chunks with new metadata fields
-
-  Pros:
-  - ✅ Clean, no orphaned records
-  - ✅ Guaranteed consistency
-  - ✅ Simple, one command
-
-  Cons:
-  - ⚠️ Brief downtime (table is empty during reload)
-  - ⚠️ Re-embeds everything (costs API calls to Bedrock)
-
-  ---
-
-  ## Option 2: Blue-Green Deployment (Zero Downtime)
-
-  Use when:
-  - Production system with active users
-  - Can't afford downtime
-  - Want to validate new embeddings before switching
-
-  How:
-  ```bash
-  # 1. Load into a new table
-  python3 scripts/vectorise_and_store.py \
-    --chunks-file chunks/chunks_output.json \
-    --table-name code_embeddings_new \
-    --clear
-
-  # 2. Validate the new table (run some test queries)
-
-  # 3. Rename tables in PostgreSQL
-  psql -U postgres -d postgres -c "
-  BEGIN;
-  ALTER TABLE code_embeddings RENAME TO code_embeddings_old;
-  ALTER TABLE code_embeddings_new RENAME TO code_embeddings;
-  COMMIT;
-  "
-
-  # 4. Drop old table after confirming everything works
-  psql -U postgres -d postgres -c "DROP TABLE code_embeddings_old;"
-  ```
-
-  Pros:
-  - ✅ Zero downtime
-  - ✅ Can rollback if issues found
-  - ✅ Validation before switching
-
-  Cons:
-  - ⚠️ More complex
-  - ⚠️ Temporarily uses 2x storage
-
-  ---
-
-  ## Option 3: Manual PostgreSQL Truncate
-
-  Use when:
-  - You want explicit control
-  - Debugging database issues
-
-  How:
-  ```bash
-  # Connect to PostgreSQL
-  psql -U postgres -d postgres
-
-  # In psql:
-  TRUNCATE TABLE code_embeddings;
-
-  # Or drop and recreate (also removes indexes)
-  DROP TABLE IF EXISTS code_embeddings;
-
-  # Exit psql
-  \q
-
-  # Now run vectorisation WITHOUT --clear flag
-  python3 scripts/vectorise_and_store.py \
-    --chunks-file chunks/chunks_output.json
-  ```
-
-  Pros:
-  - ✅ Full control over database
-  - ✅ Can inspect schema before reload
-
-  Cons:
-  - ⚠️ Manual steps, error-prone
-  - ⚠️ Need to remember to recreate schema
-
-  ---
-
-  ## What's the difference between TRUNCATE and DELETE?
-
-  ```sql
-  -- DELETE: Removes all rows, keeps table structure
-  DELETE FROM code_embeddings;
-
-  -- TRUNCATE: Faster, resets table (what --clear uses)
-  TRUNCATE TABLE code_embeddings;
-
-  -- DROP: Removes entire table and schema
-  DROP TABLE code_embeddings;
-  ```
-
-  The script uses DELETE FROM (line 215 in pgvector_store.py), which is safe and preserves the schema.
-
-  ---
-
-  ## What happens to my data during --clear?
-
-  Looking at vectorise_and_store.py:
-
-  ```python
-  # Line 159-161
-  if clear_existing:
-      print("\n🗑️  Clearing existing data")
-      vector_store.delete_all()
-  ```
-
-  This calls delete_all() in pgvector_store.py:
-
-  ```python
-  # Line 212-216
-  def delete_all(self):
-      """Delete all records from the table"""
-      with self.conn.cursor() as cur:
-          cur.execute(f"DELETE FROM {self.table_name}")
-          self.conn.commit()
-  ```
-
-  **It's safe:** Only deletes records, preserves table schema and indexes.
-
-  ---
-
-  ## How do I verify the new metadata fields are stored?
-
-  After re-vectorisation, query the database:
-
-  ```bash
-  psql -U postgres -d postgres -c "
-  SELECT
-    id,
-    metadata->>'layer' as layer,
-    metadata->>'class_name' as class_name,
-    metadata->>'annotations' as annotations,
-    metadata->>'http_method' as http_method
-  FROM code_embeddings
-  LIMIT 5;
-  "
-  ```
-
-  Or check a specific Java class:
-
-  ```bash
-  psql -U postgres -d postgres -c "
-  SELECT
-    metadata->>'class_name' as class,
-    metadata->>'layer' as layer,
-    metadata->>'annotations' as annotations
-  FROM code_embeddings
-  WHERE metadata->>'file_type' = 'java'
-  LIMIT 10;
-  "
-  ```
-
-  ---
-
-  ## Can I incrementally update just changed chunks?
-
-  **Current limitation:** The script doesn't support incremental updates. It's designed for full reload.
-
-  **Why:**
-  - Embeddings change if you modify prepare_chunk_content()
-  - Hard to track which chunks changed vs which metadata changed
-  - Easier to maintain consistency with full reload
-
-  **Future enhancement:** You could add incremental updates by:
-  1. Comparing chunk_id between old and new chunks
-  2. Only re-embedding chunks with changed content
-  3. Using UPSERT (INSERT ... ON CONFLICT UPDATE)
-
-  For now, **full reload with --clear is the safest and recommended approach**.
-
-  ---
-
-  ## How long does re-vectorisation take?
-
-  **Depends on:**
-  - Number of chunks
-  - Bedrock API rate limits
-  - Batch size
-
-  **Current setup:**
-  - Batch size: 25 chunks
-  - Model: amazon.titan-embed-text-v2:0
-  - Estimated: ~2-3 seconds per batch
-
-  **For 100 chunks:**
-  - ~4 batches
-  - ~10-15 seconds total
-
-  **For 1000 chunks:**
-  - ~40 batches
-  - ~2-3 minutes total
-
-  The script shows a progress bar with tqdm, so you can monitor it.
-
-  ---
-
-  ## Recommended Workflow for Your Current Situation
-
-  Since you've updated the chunking script with new metadata fields:
-
-  ```bash
-  cd /Users/dinindu/Projects/GitHub/dini-test-poc/rag
-
-  # Step 1: Re-run chunking (if you changed the chunker)
-  ./scripts/chunk_code.sh
-
-  # Step 2: Re-vectorise with new metadata (clears old data)
-  ./scripts/vectorise_data.sh
-
-  # Step 3: Verify new metadata fields
-  psql -U postgres -d postgres -c "
-  SELECT metadata->>'layer', metadata->>'annotations', COUNT(*)
-  FROM code_embeddings
-  GROUP BY metadata->>'layer', metadata->>'annotations';
-  "
-
-  # Step 4: Test retrieval
-  python3 examples/strands_example.py
-  ```
-
-  **Total time:** ~2-5 minutes depending on codebase size.
-
-  ---
-
-  ## Cost Considerations
-
-  **Bedrock Titan Embeddings Pricing** (as of 2024):
-  - $0.0001 per 1K input tokens
-  - Average code chunk: ~200 tokens
-
-  **For 1000 chunks:**
-  - ~200K tokens
-  - Cost: ~$0.02 (2 cents)
-
-  Re-vectorising is very cheap, so don't worry about doing full reloads frequently during development.
-
-
-====================================================================================================================================
-> in this AST parsing, are we getting machine code or binary code or something else to build the tree. explain me this.
-
-⏺ Great question! Let me explain what AST (Abstract Syntax Tree) parsing actually does and what it works with.
+⏺ Tree-sitter works with **source code text**, not compiled binaries. Let me explain the input format and how it builds the AST.
 
   ## What AST Parsing Works With
 
@@ -1166,3 +890,265 @@ to agree or disagree with me. I just want to know the best and right approach wh
   **Tree-sitter is like a "smart code parser"** that understands programming language grammar, similar to how an HTML parser understands HTML tags!
 
   It works with **human-readable source code**, not compiled binaries. This is why we can extract exact code snippets and understand the structure - we're working with the original text file, just organized into a tree for easy navigation.
+
+
+====================================================================================================================================
+> Explain pgvector indexing strategies: IVFFlat vs HNSW, and which is best for code search
+
+⏺ HNSW (Hierarchical Navigable Small World) is best for code search due to its high accuracy and fast queries for small-to-medium datasets, while IVFFlat is better for very large datasets (100k+ vectors). Let me explain both strategies:
+
+  ## Index Strategy 1: IVFFlat (Inverted File with Flat Search)
+
+  **SQL:**
+  ```sql
+  CREATE INDEX ON code_embeddings
+  USING ivfflat (embedding vector_cosine_ops)
+  WITH (lists = 100);
+  ```
+
+  **How it works:**
+
+  1. **Clustering Phase** (index build):
+     - Divides all vectors into 100 clusters (like neighborhoods)
+     - Each vector assigned to nearest cluster centroid
+
+  2. **Search Phase** (query time):
+     - Find closest cluster(s) to query vector
+     - Search ALL vectors within that cluster exhaustively
+
+  **Visual:**
+  ```
+  Query: [0.2, 0.3, 0.4]
+         ↓
+  Find nearest cluster → Cluster 42
+         ↓
+  Scan all vectors in Cluster 42 exhaustively
+         ↓
+  Return top K results
+  ```
+
+  **Parameters:**
+  - `lists = 100`: Number of clusters to create
+    - Rule of thumb: `lists = rows / 1000` for large datasets
+    - More lists = finer partitioning = faster search, slower build
+
+  **Trade-offs:**
+  - ✅ Fast for very large datasets (millions of vectors)
+  - ✅ Lower memory usage
+  - ❌ **Approximate results** (might miss true nearest neighbor)
+  - ❌ Requires training/clustering phase
+  - ❌ Not optimal for small datasets (<100k vectors)
+
+  ---
+
+  ## Index Strategy 2: HNSW (Hierarchical Navigable Small World)
+
+  **SQL:**
+  ```sql
+  CREATE INDEX ON code_embeddings
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64);
+  ```
+
+  **How it works:**
+
+  Multi-layer graph structure (like a highway system):
+
+  ```
+  Layer 2 (highways):     A -------- B
+
+  Layer 1 (main roads):   A -- C -- B -- D
+                          |    |    |    |
+  Layer 0 (local):        A-C-E-F-B-G-D-H-I...
+  ```
+
+  **Search Process:**
+  1. Start at top layer (sparse, long jumps)
+  2. Navigate to closest node
+  3. Descend to next layer (denser connections)
+  4. Refine search until bottom layer
+  5. Return top K results
+
+  **Parameters:**
+  - `m = 16`: Number of bi-directional links per node
+    - Higher M = more connections = better accuracy, more memory
+    - Default and recommended: 16
+
+  - `ef_construction = 64`: Candidates explored during index build
+    - Higher = slower build, better quality graph
+    - Recommended: 64-128 for code search
+
+  **Trade-offs:**
+  - ✅ **Excellent recall** (very accurate approximate search)
+  - ✅ Fast queries after building
+  - ✅ No training phase needed
+  - ✅ Works great for small to large datasets
+  - ❌ Slower to build than IVFFlat
+  - ❌ Higher memory usage
+
+  ---
+
+  ## Distance Metrics
+
+  ### Cosine Distance (`vector_cosine_ops`)
+
+  Measures directional similarity, ignoring magnitude:
+
+  ```
+  similarity = 1 - cosine_distance
+
+  Vector A: [0.1, 0.2, 0.3]  (short code snippet)
+  Vector B: [0.3, 0.6, 0.9]  (long code snippet, same direction)
+
+  Cosine similarity: 1.0 (identical direction, different magnitude)
+  ```
+
+  **Best for:** Text/code embeddings where length varies
+
+  ### Euclidean Distance (`vector_l2_ops`)
+
+  Measures straight-line distance, magnitude-sensitive:
+
+  ```
+  distance = sqrt((A[0]-B[0])² + (A[1]-B[1])² + ...)
+
+  Vector A: [0.1, 0.2, 0.3]
+  Vector B: [0.3, 0.6, 0.9]
+
+  L2 distance: 0.693 (penalized for magnitude difference)
+  ```
+
+  **Best for:** Image embeddings, magnitude matters
+
+  ---
+
+  ## Side-by-Side Comparison
+
+  | Aspect | IVFFlat + Cosine | HNSW + Cosine |
+  |--------|------------------|---------------|
+  | **Structure** | Clusters (neighborhoods) | Multi-layer graph (highways) |
+  | **Search** | Find cluster → scan all | Navigate graph layers |
+  | **Build Speed** | ⚡ Fast | 🐢 Slower |
+  | **Query Speed** | 🚀 Good | 🚀🚀 Excellent |
+  | **Accuracy** | ~Good (tunable) | ⭐ Excellent |
+  | **Memory** | 💾 Lower | 💾💾 Higher |
+  | **Best for** | 100k+ vectors | 100 - 1M vectors |
+
+  ---
+
+  ## Why We Chose HNSW + Cosine for Code Search
+
+  **Your use case:**
+  - Vectorising codebase (Spring Boot Java)
+  - Current: ~30 chunks, expected growth: 1k-10k chunks
+  - Need: High accuracy code retrieval
+
+  **Reasons for HNSW:**
+
+  1. **High Accuracy is Critical**
+     ```
+     Query: "authentication middleware"
+
+     You need to find:
+     ✅ Auth filter classes
+     ✅ JWT validation methods
+     ✅ Security config
+
+     Not acceptable to miss:
+     ❌ The actual AuthenticationFilter
+     ```
+
+  2. **Dataset Size is Small-to-Medium**
+     - IVFFlat optimal for 100k+ vectors
+     - Your codebase: likely < 10k chunks
+     - HNSW handles this range perfectly
+
+  3. **No Training Phase**
+     - IVFFlat requires clustering (rebuild when data changes)
+     - HNSW builds incrementally (add vectors anytime)
+
+  4. **Fast Queries**
+     - HNSW navigates graph layers efficiently
+     - Critical for interactive code search
+
+  **Reasons for Cosine:**
+
+  1. **Code Length Varies**
+     ```
+     Short utility:
+     def add(a, b):
+         return a + b
+
+     Long controller:
+     @RestController
+     public class SampleController {
+         // ... 50 lines of code ...
+     }
+     ```
+
+     With cosine: Both compared by semantic meaning
+     With L2: Long snippet penalized for length
+
+  2. **Bedrock Titan Embeddings**
+     - Titan embeddings are normalized
+     - Designed for cosine similarity
+
+  3. **Semantic Search**
+     - Query: "REST endpoint handler"
+     - Should match: `@RestController` classes
+     - Direction matters, not magnitude
+
+  ---
+
+  ## Current Implementation
+
+  **In `pgvector_store.py:64`:**
+  ```python
+  CREATE INDEX IF NOT EXISTS code_embeddings_embedding_idx
+  ON code_embeddings
+  USING hnsw (embedding vector_cosine_ops)
+  WITH (m = 16, ef_construction = 64)
+  ```
+
+  **What this means:**
+  - Uses HNSW graph structure
+  - Cosine distance for similarity
+  - Each node connects to 16 neighbors
+  - Explores 64 candidates during build
+
+  ---
+
+  ## If Your Codebase Grows
+
+  **Small (<10k chunks):** Current settings perfect
+  ```sql
+  WITH (m = 16, ef_construction = 64)
+  ```
+
+  **Medium (10k-50k chunks):** Increase quality
+  ```sql
+  WITH (m = 24, ef_construction = 100)
+  ```
+
+  **Large (50k+ chunks):** Maximum accuracy
+  ```sql
+  WITH (m = 32, ef_construction = 128)
+  ```
+
+  **Very large (1M+ chunks):** Consider IVFFlat
+  ```sql
+  USING ivfflat (embedding vector_cosine_ops)
+  WITH (lists = 1000)
+  ```
+
+  ---
+
+  ## Summary
+
+  **Best practice for code search:**
+  - ✅ Use **HNSW** (accurate, fast, no training)
+  - ✅ Use **Cosine distance** (length-invariant, semantic)
+  - ✅ Parameters: `m = 16, ef_construction = 64` (proven defaults)
+  - ✅ Scale up parameters as codebase grows
+
+  **Your current setup is optimal for code vectorisation!** 🚀

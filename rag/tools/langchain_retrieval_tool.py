@@ -18,4 +18,4 @@ vector_store = PGVector(
 )
 
 # Now you can use 'vector_store' to search for similar items
-# similar_items = vector_store.similarity_search("your query")
+similar_items = vector_store.similarity_search("your query")

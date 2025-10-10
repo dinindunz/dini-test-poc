@@ -57,11 +57,12 @@ class PgVectorStore:
             """)
 
             # Create index for faster similarity search
+            # HNSW with cosine distance - optimal for code search (semantic similarity)
             cur.execute(f"""
                 CREATE INDEX IF NOT EXISTS {self.table_name}_embedding_idx
                 ON {self.table_name}
-                USING ivfflat (embedding vector_cosine_ops)
-                WITH (lists = 100)
+                USING hnsw (embedding vector_cosine_ops)
+                WITH (m = 16, ef_construction = 64)
             """)
 
             self.conn.commit()

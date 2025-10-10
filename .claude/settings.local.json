@@ -10,7 +10,8 @@
       "Bash(tree:*)",
       "Bash(git mv:*)",
       "Bash(git rm:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Read(///**)"
     ],
     "deny": [],
     "ask": []
