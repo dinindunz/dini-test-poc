@@ -182,8 +182,7 @@
   This is called RAG (Retrieval Augmented Generation) - the agent retrieves relevant code, then generates a response based on that context! 🚀
 
 
-
-
+====================================================================================================================================
 > what is the role of metadata here. only content is vectorised
 
 ⏺ Excellent observation! You're absolutely right - only content is vectorised. Let me clarify the distinct roles:
@@ -355,8 +354,7 @@
   Both together = Powerful hybrid search! 🎉
 
 
-
-
+====================================================================================================================================
 > so far we have vectorised only 01_dini_java17-quickstart-helloworld. if I ask in prompt like generate the code for java hello world springboot 
 application, would all chunks will be fsent to the LLM as per the current way we vectorised this? 
 
@@ -523,7 +521,7 @@ application, would all chunks will be fsent to the LLM as per the current way we
   This is what makes RAG powerful - you get the right context, not all context.
 
 
-
+====================================================================================================================================
 > I can see you updated both prepare_chunk_metadata and prepare_chunk_content. I get why you updated prepare_chunk_metadata because we were enriching 
 metadata fiter. But adding all these into prepare_chunk_content they also getting vectorised. previous it had only type and content. I dont want you 
 to agree or disagree with me. I just want to know the best and right approach when vectorising code bases 
@@ -683,3 +681,488 @@ to agree or disagree with me. I just want to know the best and right approach wh
   the right approach for a Spring Boot codebase.
 
   The key principle: Include metadata that has semantic meaning, exclude pure identifiers. You're doing exactly that.
+
+
+====================================================================================================================================
+> since now we have updated chunking script, we have new chunks. how can I safely revectorise and store them in pg database. do i have to truncate the table and reload it all?
+
+⏺ Good question! You have a few options for safely re-vectorising. Let me show you the safest approach:
+
+  ## Option 1: Clear and Reload (Recommended for Complete Refresh)
+
+  The vectorisation script already has a --clear flag that safely truncates and reloads:
+
+  ```bash
+  cd /Users/dinindu/Projects/GitHub/dini-test-poc/rag
+
+  # Using the shell script (recommended)
+  ./scripts/vectorise_data.sh
+
+  # Or manually with Python
+  python3 scripts/vectorise_and_store.py \
+    --chunks-file chunks/chunks_output.json \
+    --clear
+  ```
+
+  What happens:
+  1. Script runs DELETE FROM code_embeddings to clear all existing data
+  2. Re-generates embeddings for all chunks
+  3. Inserts all chunks with new metadata fields
+
+  Pros:
+  - ✅ Clean, no orphaned records
+  - ✅ Guaranteed consistency
+  - ✅ Simple, one command
+
+  Cons:
+  - ⚠️ Brief downtime (table is empty during reload)
+  - ⚠️ Re-embeds everything (costs API calls to Bedrock)
+
+  ---
+
+  ## Option 2: Blue-Green Deployment (Zero Downtime)
+
+  Use when:
+  - Production system with active users
+  - Can't afford downtime
+  - Want to validate new embeddings before switching
+
+  How:
+  ```bash
+  # 1. Load into a new table
+  python3 scripts/vectorise_and_store.py \
+    --chunks-file chunks/chunks_output.json \
+    --table-name code_embeddings_new \
+    --clear
+
+  # 2. Validate the new table (run some test queries)
+
+  # 3. Rename tables in PostgreSQL
+  psql -U postgres -d postgres -c "
+  BEGIN;
+  ALTER TABLE code_embeddings RENAME TO code_embeddings_old;
+  ALTER TABLE code_embeddings_new RENAME TO code_embeddings;
+  COMMIT;
+  "
+
+  # 4. Drop old table after confirming everything works
+  psql -U postgres -d postgres -c "DROP TABLE code_embeddings_old;"
+  ```
+
+  Pros:
+  - ✅ Zero downtime
+  - ✅ Can rollback if issues found
+  - ✅ Validation before switching
+
+  Cons:
+  - ⚠️ More complex
+  - ⚠️ Temporarily uses 2x storage
+
+  ---
+
+  ## Option 3: Manual PostgreSQL Truncate
+
+  Use when:
+  - You want explicit control
+  - Debugging database issues
+
+  How:
+  ```bash
+  # Connect to PostgreSQL
+  psql -U postgres -d postgres
+
+  # In psql:
+  TRUNCATE TABLE code_embeddings;
+
+  # Or drop and recreate (also removes indexes)
+  DROP TABLE IF EXISTS code_embeddings;
+
+  # Exit psql
+  \q
+
+  # Now run vectorisation WITHOUT --clear flag
+  python3 scripts/vectorise_and_store.py \
+    --chunks-file chunks/chunks_output.json
+  ```
+
+  Pros:
+  - ✅ Full control over database
+  - ✅ Can inspect schema before reload
+
+  Cons:
+  - ⚠️ Manual steps, error-prone
+  - ⚠️ Need to remember to recreate schema
+
+  ---
+
+  ## What's the difference between TRUNCATE and DELETE?
+
+  ```sql
+  -- DELETE: Removes all rows, keeps table structure
+  DELETE FROM code_embeddings;
+
+  -- TRUNCATE: Faster, resets table (what --clear uses)
+  TRUNCATE TABLE code_embeddings;
+
+  -- DROP: Removes entire table and schema
+  DROP TABLE code_embeddings;
+  ```
+
+  The script uses DELETE FROM (line 215 in pgvector_store.py), which is safe and preserves the schema.
+
+  ---
+
+  ## What happens to my data during --clear?
+
+  Looking at vectorise_and_store.py:
+
+  ```python
+  # Line 159-161
+  if clear_existing:
+      print("\n🗑️  Clearing existing data")
+      vector_store.delete_all()
+  ```
+
+  This calls delete_all() in pgvector_store.py:
+
+  ```python
+  # Line 212-216
+  def delete_all(self):
+      """Delete all records from the table"""
+      with self.conn.cursor() as cur:
+          cur.execute(f"DELETE FROM {self.table_name}")
+          self.conn.commit()
+  ```
+
+  **It's safe:** Only deletes records, preserves table schema and indexes.
+
+  ---
+
+  ## How do I verify the new metadata fields are stored?
+
+  After re-vectorisation, query the database:
+
+  ```bash
+  psql -U postgres -d postgres -c "
+  SELECT
+    id,
+    metadata->>'layer' as layer,
+    metadata->>'class_name' as class_name,
+    metadata->>'annotations' as annotations,
+    metadata->>'http_method' as http_method
+  FROM code_embeddings
+  LIMIT 5;
+  "
+  ```
+
+  Or check a specific Java class:
+
+  ```bash
+  psql -U postgres -d postgres -c "
+  SELECT
+    metadata->>'class_name' as class,
+    metadata->>'layer' as layer,
+    metadata->>'annotations' as annotations
+  FROM code_embeddings
+  WHERE metadata->>'file_type' = 'java'
+  LIMIT 10;
+  "
+  ```
+
+  ---
+
+  ## Can I incrementally update just changed chunks?
+
+  **Current limitation:** The script doesn't support incremental updates. It's designed for full reload.
+
+  **Why:**
+  - Embeddings change if you modify prepare_chunk_content()
+  - Hard to track which chunks changed vs which metadata changed
+  - Easier to maintain consistency with full reload
+
+  **Future enhancement:** You could add incremental updates by:
+  1. Comparing chunk_id between old and new chunks
+  2. Only re-embedding chunks with changed content
+  3. Using UPSERT (INSERT ... ON CONFLICT UPDATE)
+
+  For now, **full reload with --clear is the safest and recommended approach**.
+
+  ---
+
+  ## How long does re-vectorisation take?
+
+  **Depends on:**
+  - Number of chunks
+  - Bedrock API rate limits
+  - Batch size
+
+  **Current setup:**
+  - Batch size: 25 chunks
+  - Model: amazon.titan-embed-text-v2:0
+  - Estimated: ~2-3 seconds per batch
+
+  **For 100 chunks:**
+  - ~4 batches
+  - ~10-15 seconds total
+
+  **For 1000 chunks:**
+  - ~40 batches
+  - ~2-3 minutes total
+
+  The script shows a progress bar with tqdm, so you can monitor it.
+
+  ---
+
+  ## Recommended Workflow for Your Current Situation
+
+  Since you've updated the chunking script with new metadata fields:
+
+  ```bash
+  cd /Users/dinindu/Projects/GitHub/dini-test-poc/rag
+
+  # Step 1: Re-run chunking (if you changed the chunker)
+  ./scripts/chunk_code.sh
+
+  # Step 2: Re-vectorise with new metadata (clears old data)
+  ./scripts/vectorise_data.sh
+
+  # Step 3: Verify new metadata fields
+  psql -U postgres -d postgres -c "
+  SELECT metadata->>'layer', metadata->>'annotations', COUNT(*)
+  FROM code_embeddings
+  GROUP BY metadata->>'layer', metadata->>'annotations';
+  "
+
+  # Step 4: Test retrieval
+  python3 examples/strands_example.py
+  ```
+
+  **Total time:** ~2-5 minutes depending on codebase size.
+
+  ---
+
+  ## Cost Considerations
+
+  **Bedrock Titan Embeddings Pricing** (as of 2024):
+  - $0.0001 per 1K input tokens
+  - Average code chunk: ~200 tokens
+
+  **For 1000 chunks:**
+  - ~200K tokens
+  - Cost: ~$0.02 (2 cents)
+
+  Re-vectorising is very cheap, so don't worry about doing full reloads frequently during development.
+
+
+====================================================================================================================================
+> in this AST parsing, are we getting machine code or binary code or something else to build the tree. explain me this.
+
+⏺ Great question! Let me explain what AST (Abstract Syntax Tree) parsing actually does and what it works with.
+
+  ## What AST Parsing Works With
+
+  AST parsing works with **source code text** (like your `.java` files), NOT machine code or binary. Here's the breakdown:
+
+  ### Your Java File (Source Code Text)
+
+  ```java
+  @RestController
+  @RequestMapping("/api/hello")
+  public class SampleController {
+      @GetMapping
+      public String hello() {
+          return "Hello World";
+      }
+  }
+  ```
+
+  ### Step 1: Read as Plain Text
+
+  ```python
+  # Line 74 in multi_module_chunker.py
+  content = file_path.read_text(encoding='utf-8')
+  # content = "@RestController\n@RequestMapping...\npublic class SampleController..."
+  ```
+
+  This is just **plain text** - the same as opening the file in a text editor.
+
+  ### Step 2: Parse Text into AST (Tree Structure)
+
+  ```python
+  # Line 75 in multi_module_chunker.py
+  tree = self.java_parser.parse(bytes(content, "utf8"))
+  ```
+
+  Tree-sitter analyzes the text and builds a **tree structure** representing the code's syntax:
+
+  ```
+  program
+  └── class_declaration
+      ├── modifiers
+      │   ├── marker_annotation: @RestController
+      │   └── annotation: @RequestMapping("/api/hello")
+      ├── identifier: "SampleController"
+      └── class_body
+          └── method_declaration
+              ├── modifiers
+              │   └── marker_annotation: @GetMapping
+              ├── type: "String"
+              ├── identifier: "hello"
+              ├── parameters: ()
+              └── block
+                  └── return_statement: "Hello World"
+  ```
+
+  This is **NOT binary/machine code**. It's a **structured representation** of your source code.
+
+  ### Step 3: Navigate the Tree to Find Nodes
+
+  ```python
+  # Line 82-84 in multi_module_chunker.py
+  class_nodes = self._find_nodes_by_type(tree.root_node, 'class_declaration')
+  record_nodes = self._find_nodes_by_type(tree.root_node, 'record_declaration')
+  ```
+
+  We traverse the tree to find specific node types (like finding `<div>` tags in HTML DOM).
+
+  ### Step 4: Extract Code Using Byte Positions
+
+  ```python
+  # Line 91 in multi_module_chunker.py
+  class_content = content[class_node.start_byte:class_node.end_byte]
+  ```
+
+  Each node knows its **start and end position** in the original text. We use these positions to extract the exact code.
+
+  ## Key Concept: Source Code, Not Binary
+
+  | **What It Is** | **What It's NOT** |
+  |----------------|-------------------|
+  | ✅ Source code text (`.java` files) | ❌ Compiled bytecode (`.class` files) |
+  | ✅ Plain text characters | ❌ Machine code (binary) |
+  | ✅ Abstract Syntax Tree (structured representation) | ❌ Execution instructions |
+  | ✅ Parsing (like HTML parser) | ❌ Compilation |
+
+  ## Analogy: HTML Parser
+
+  Think of it like parsing HTML:
+
+  **HTML Text:**
+  ```html
+  <div class="container">
+      <h1>Hello</h1>
+      <p>World</p>
+  </div>
+  ```
+
+  **HTML Parser Creates DOM Tree:**
+  ```
+  div (class="container")
+  ├── h1: "Hello"
+  └── p: "World"
+  ```
+
+  **Tree-sitter does the SAME for Java:**
+
+  **Java Text:**
+  ```java
+  @RestController
+  public class SampleController {
+      public String hello() { return "Hello"; }
+  }
+  ```
+
+  **Tree-sitter Creates AST:**
+  ```
+  class_declaration
+  ├── modifiers: @RestController
+  ├── identifier: "SampleController"
+  └── method_declaration
+      ├── identifier: "hello"
+      └── return: "Hello"
+  ```
+
+  ## Why Use AST Instead of Regex?
+
+  **❌ Bad Approach (Regex) - Fragile:**
+  ```python
+  # Find class name using regex - breaks easily!
+  class_name = re.search(r'class\s+(\w+)', content).group(1)
+
+  # Problems:
+  # - Doesn't understand code structure
+  # - Breaks on nested classes
+  # - Fails on multiline declarations
+  # - Can't distinguish comments from code
+  ```
+
+  **✅ Good Approach (AST) - Precise:**
+  ```python
+  # Find class name using AST - robust!
+  class_node = self._find_nodes_by_type(tree.root_node, 'class_declaration')
+  class_name = self._get_identifier(class_node, 'identifier')
+
+  # Benefits:
+  # - Understands code structure
+  # - Handles nested classes correctly
+  # - Works with any formatting
+  # - Ignores comments automatically
+  ```
+
+  ## Real Example from Our Chunker
+
+  **Extract Annotations (Lines 293-306 in multi_module_chunker.py):**
+
+  ```python
+  def _extract_annotations(self, node, content: str) -> List[str]:
+      """Extract annotations from a node using AST"""
+      annotations = []
+
+      # Check if node has a 'modifiers' child (contains annotations)
+      for child in node.children:
+          if child.type == 'modifiers':
+              # Find all marker_annotation and annotation nodes
+              for modifier_child in child.children:
+                  if modifier_child.type in ['marker_annotation', 'annotation']:
+                      ann_text = content[modifier_child.start_byte:modifier_child.end_byte]
+                      annotations.append(ann_text)
+
+      return annotations
+  ```
+
+  **How it works:**
+  1. Navigate tree to find `modifiers` node
+  2. Look for `marker_annotation` or `annotation` child nodes
+  3. Use `start_byte` and `end_byte` to extract text from original source
+  4. Return: `["@RestController", "@RequestMapping(\"/api/hello\")"]`
+
+  ## What Tree-sitter Provides
+
+  Each AST node has these properties:
+
+  ```python
+  class_node.type           # "class_declaration"
+  class_node.start_byte     # 0
+  class_node.end_byte       # 123
+  class_node.start_point    # (0, 0) - line 0, column 0
+  class_node.end_point      # (7, 1) - line 7, column 1
+  class_node.text           # b"@RestController\npublic class..."
+  class_node.children       # [modifiers_node, identifier_node, body_node]
+  ```
+
+  We use these properties to:
+  - Navigate the code structure
+  - Find specific elements (classes, methods, annotations)
+  - Extract exact code snippets
+  - Determine code locations
+
+  ## Summary
+
+  - **Input**: Plain text source code (`.java`, `.py`, `.ts` files)
+  - **Process**: Tree-sitter parses text into an Abstract Syntax Tree (AST)
+  - **Output**: Structured tree representing code syntax
+  - **NOT**: Binary code, machine code, or compiled bytecode
+
+  **Tree-sitter is like a "smart code parser"** that understands programming language grammar, similar to how an HTML parser understands HTML tags!
+
+  It works with **human-readable source code**, not compiled binaries. This is why we can extract exact code snippets and understand the structure - we're working with the original text file, just organized into a tree for easy navigation.

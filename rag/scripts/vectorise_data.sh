@@ -26,7 +26,8 @@ python vectorise_and_store.py \
     --chunks-file ../chunks/chunks_output.json \
     --model-id amazon.titan-embed-text-v2:0 \
     --table-name code_embeddings \
-    --batch-size 25
+    --batch-size 25 \
+    --clear
 
 echo ""
 echo "✅ Vectorisation pipeline complete!"
