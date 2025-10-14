@@ -6,266 +6,279 @@
 
 ---
 
-## Question
-
 Explain pgvector indexing strategies: IVFFlat vs HNSW, and which is best for code search
 
 HNSW (Hierarchical Navigable Small World) is best for code search due to its high accuracy and fast queries for small-to-medium datasets, while IVFFlat is better for very large datasets (100k+ vectors). Here's a detailed comparison:
 
-  ## Index Strategy 1: IVFFlat (Inverted File with Flat Search)
-
-  **SQL:**
-  ```sql
-  CREATE INDEX ON code_embeddings
-  USING ivfflat (embedding vector_cosine_ops)
-  WITH (lists = 100);
-  ```
+### Index Strategy 1: IVFFlat (Inverted File with Flat Search)
 
-  **How it works:**
+**SQL:**
 
-  1. **Clustering Phase** (index build):
-     - Divides all vectors into 100 clusters (like neighborhoods)
-     - Each vector assigned to nearest cluster centroid
+```sql
+CREATE INDEX ON code_embeddings
+USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 100);
+```
 
-  2. **Search Phase** (query time):
-     - Find closest cluster(s) to query vector
-     - Search ALL vectors within that cluster exhaustively
+**How it works:**
 
-  **Visual:**
-  ```
-  Query: [0.2, 0.3, 0.4]
-         ↓
-  Find nearest cluster → Cluster 42
-         ↓
-  Scan all vectors in Cluster 42 exhaustively
-         ↓
-  Return top K results
-  ```
+1. **Clustering Phase** (index build):
+   - Divides all vectors into 100 clusters (like neighbourhoods)
+   - Each vector assigned to nearest cluster centroid
 
-  **Parameters:**
-  - `lists = 100`: Number of clusters to create
-    - Rule of thumb: `lists = rows / 1000` for large datasets
-    - More lists = finer partitioning = faster search, slower build
+2. **Search Phase** (query time):
+   - Find closest cluster(s) to query vector
+   - Search ALL vectors within that cluster exhaustively
 
-  **Trade-offs:**
-  - ✅ Fast for very large datasets (millions of vectors)
-  - ✅ Lower memory usage
-  - ❌ **Approximate results** (might miss true nearest neighbor)
-  - ❌ Requires training/clustering phase
-  - ❌ Not optimal for small datasets (<100k vectors)
+**Visual:**
 
-  ---
+```
+Query: [0.2, 0.3, 0.4]
+       ↓
+Find nearest cluster → Cluster 42
+       ↓
+Scan all vectors in Cluster 42 exhaustively
+       ↓
+Return top K results
+```
 
-  ## Index Strategy 2: HNSW (Hierarchical Navigable Small World)
+**Parameters:**
+- `lists = 100`: Number of clusters to create
+  - Rule of thumb: `lists = rows / 1000` for large datasets
+  - More lists = finer partitioning = faster search, slower build
 
-  **SQL:**
-  ```sql
-  CREATE INDEX ON code_embeddings
-  USING hnsw (embedding vector_cosine_ops)
-  WITH (m = 16, ef_construction = 64);
-  ```
+**Trade-offs:**
+- ✅ Fast for very large datasets (millions of vectors)
+- ✅ Lower memory usage
+- ❌ **Approximate results** (might miss true nearest neighbour)
+- ❌ Requires training/clustering phase
+- ❌ Not optimal for small datasets (<100k vectors)
 
-  **How it works:**
+---
 
-  Multi-layer graph structure (like a highway system):
+### Index Strategy 2: HNSW (Hierarchical Navigable Small World)
 
-  ```
-  Layer 2 (highways):     A -------- B
+**SQL:**
 
-  Layer 1 (main roads):   A -- C -- B -- D
-                          |    |    |    |
-  Layer 0 (local):        A-C-E-F-B-G-D-H-I...
-  ```
+```sql
+CREATE INDEX ON code_embeddings
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 64);
+```
 
-  **Search Process:**
-  1. Start at top layer (sparse, long jumps)
-  2. Navigate to closest node
-  3. Descend to next layer (denser connections)
-  4. Refine search until bottom layer
-  5. Return top K results
+**How it works:**
 
-  **Parameters:**
-  - `m = 16`: Number of bi-directional links per node
-    - Higher M = more connections = better accuracy, more memory
-    - Default and recommended: 16
+Multi-layer graph structure (like a highway system):
 
-  - `ef_construction = 64`: Candidates explored during index build
-    - Higher = slower build, better quality graph
-    - Recommended: 64-128 for code search
+```
+Layer 2 (highways):     A -------- B
 
-  **Trade-offs:**
-  - ✅ **Excellent recall** (very accurate approximate search)
-  - ✅ Fast queries after building
-  - ✅ No training phase needed
-  - ✅ Works great for small to large datasets
-  - ❌ Slower to build than IVFFlat
-  - ❌ Higher memory usage
+Layer 1 (main roads):   A -- C -- B -- D
+                        |    |    |    |
+Layer 0 (local):        A-C-E-F-B-G-D-H-I...
+```
 
-  ---
+**Search Process:**
+1. Start at top layer (sparse, long jumps)
+2. Navigate to closest node
+3. Descend to next layer (denser connections)
+4. Refine search until bottom layer
+5. Return top K results
 
-  ## Distance Metrics
+**Parameters:**
+- `m = 16`: Number of bi-directional links per node
+  - Higher M = more connections = better accuracy, more memory
+  - Default and recommended: 16
 
-  ### Cosine Distance (`vector_cosine_ops`)
+- `ef_construction = 64`: Candidates explored during index build
+  - Higher = slower build, better quality graph
+  - Recommended: 64-128 for code search
 
-  Measures directional similarity, ignoring magnitude:
+**Trade-offs:**
+- ✅ **Excellent recall** (very accurate approximate search)
+- ✅ Fast queries after building
+- ✅ No training phase needed
+- ✅ Works great for small to large datasets
+- ❌ Slower to build than IVFFlat
+- ❌ Higher memory usage
 
-  ```
-  similarity = 1 - cosine_distance
+---
 
-  Vector A: [0.1, 0.2, 0.3]  (short code snippet)
-  Vector B: [0.3, 0.6, 0.9]  (long code snippet, same direction)
+### Distance Metrics
 
-  Cosine similarity: 1.0 (identical direction, different magnitude)
-  ```
+#### Cosine Distance (`vector_cosine_ops`)
 
-  **Best for:** Text/code embeddings where length varies
+Measures directional similarity, ignoring magnitude:
 
-  ### Euclidean Distance (`vector_l2_ops`)
+```
+similarity = 1 - cosine_distance
 
-  Measures straight-line distance, magnitude-sensitive:
+Vector A: [0.1, 0.2, 0.3]  (short code snippet)
+Vector B: [0.3, 0.6, 0.9]  (long code snippet, same direction)
 
-  ```
-  distance = sqrt((A[0]-B[0])² + (A[1]-B[1])² + ...)
+Cosine similarity: 1.0 (identical direction, different magnitude)
+```
 
-  Vector A: [0.1, 0.2, 0.3]
-  Vector B: [0.3, 0.6, 0.9]
+**Best for:** Text/code embeddings where length varies
 
-  L2 distance: 0.693 (penalized for magnitude difference)
-  ```
+#### Euclidean Distance (`vector_l2_ops`)
 
-  **Best for:** Image embeddings, magnitude matters
+Measures straight-line distance, magnitude-sensitive:
 
-  ---
+```
+distance = sqrt((A[0]-B[0])² + (A[1]-B[1])² + ...)
 
-  ## Side-by-Side Comparison
+Vector A: [0.1, 0.2, 0.3]
+Vector B: [0.3, 0.6, 0.9]
 
-  | Aspect | IVFFlat + Cosine | HNSW + Cosine |
-  |--------|------------------|---------------|
-  | **Structure** | Clusters (neighborhoods) | Multi-layer graph (highways) |
-  | **Search** | Find cluster → scan all | Navigate graph layers |
-  | **Build Speed** | ⚡ Fast | 🐢 Slower |
-  | **Query Speed** | 🚀 Good | 🚀🚀 Excellent |
-  | **Accuracy** | ~Good (tunable) | ⭐ Excellent |
-  | **Memory** | 💾 Lower | 💾💾 Higher |
-  | **Best for** | 100k+ vectors | 100 - 1M vectors |
+L2 distance: 0.693 (penalised for magnitude difference)
+```
 
-  ---
+**Best for:** Image embeddings, magnitude matters
 
-  ## Why We Chose HNSW + Cosine for Code Search
+---
 
-  **Your use case:**
-  - Vectorising codebase (Spring Boot Java)
-  - Current: ~30 chunks, expected growth: 1k-10k chunks
-  - Need: High accuracy code retrieval
+### Side-by-Side Comparison
 
-  **Reasons for HNSW:**
+| Aspect | IVFFlat + Cosine | HNSW + Cosine |
+|--------|------------------|---------------|
+| **Structure** | Clusters (neighbourhoods) | Multi-layer graph (highways) |
+| **Search** | Find cluster → scan all | Navigate graph layers |
+| **Build Speed** | ⚡ Fast | 🐢 Slower |
+| **Query Speed** | 🚀 Good | 🚀🚀 Excellent |
+| **Accuracy** | ~Good (tunable) | ⭐ Excellent |
+| **Memory** | 💾 Lower | 💾💾 Higher |
+| **Best for** | 100k+ vectors | 100 - 1M vectors |
 
-  1. **High Accuracy is Critical**
-     ```
-     Query: "authentication middleware"
+---
 
-     You need to find:
-     ✅ Auth filter classes
-     ✅ JWT validation methods
-     ✅ Security config
+### Why We Chose HNSW + Cosine for Code Search
 
-     Not acceptable to miss:
-     ❌ The actual AuthenticationFilter
-     ```
+**Your use case:**
+- Vectorising codebase (Spring Boot Java)
+- Current: ~30 chunks, expected growth: 1k-10k chunks
+- Need: High accuracy code retrieval
 
-  2. **Dataset Size is Small-to-Medium**
-     - IVFFlat optimal for 100k+ vectors
-     - Your codebase: likely < 10k chunks
-     - HNSW handles this range perfectly
+**Reasons for HNSW:**
 
-  3. **No Training Phase**
-     - IVFFlat requires clustering (rebuild when data changes)
-     - HNSW builds incrementally (add vectors anytime)
+#### 1. High Accuracy is Critical
 
-  4. **Fast Queries**
-     - HNSW navigates graph layers efficiently
-     - Critical for interactive code search
+```
+Query: "authentication middleware"
 
-  **Reasons for Cosine:**
+You need to find:
+✅ Auth filter classes
+✅ JWT validation methods
+✅ Security config
 
-  1. **Code Length Varies**
-     ```
-     Short utility:
-     def add(a, b):
-         return a + b
+Not acceptable to miss:
+❌ The actual AuthenticationFilter
+```
 
-     Long controller:
-     @RestController
-     public class SampleController {
-         // ... 50 lines of code ...
-     }
-     ```
+#### 2. Dataset Size is Small-to-Medium
 
-     With cosine: Both compared by semantic meaning
-     With L2: Long snippet penalized for length
+- IVFFlat optimal for 100k+ vectors
+- Your codebase: likely < 10k chunks
+- HNSW handles this range perfectly
 
-  2. **Bedrock Titan Embeddings**
-     - Titan embeddings are normalized
-     - Designed for cosine similarity
+#### 3. No Training Phase
 
-  3. **Semantic Search**
-     - Query: "REST endpoint handler"
-     - Should match: `@RestController` classes
-     - Direction matters, not magnitude
+- IVFFlat requires clustering (rebuild when data changes)
+- HNSW builds incrementally (add vectors anytime)
 
-  ---
+#### 4. Fast Queries
 
-  ## Current Implementation
+- HNSW navigates graph layers efficiently
+- Critical for interactive code search
 
-  **In `pgvector_store.py:64`:**
-  ```python
-  CREATE INDEX IF NOT EXISTS code_embeddings_embedding_idx
-  ON code_embeddings
-  USING hnsw (embedding vector_cosine_ops)
-  WITH (m = 16, ef_construction = 64)
-  ```
+**Reasons for Cosine:**
 
-  **What this means:**
-  - Uses HNSW graph structure
-  - Cosine distance for similarity
-  - Each node connects to 16 neighbors
-  - Explores 64 candidates during build
+#### 1. Code Length Varies
 
-  ---
+```
+Short utility:
+def add(a, b):
+    return a + b
 
-  ## If Your Codebase Grows
+Long controller:
+@RestController
+public class SampleController {
+    // ... 50 lines of code ...
+}
+```
 
-  **Small (<10k chunks):** Current settings perfect
-  ```sql
-  WITH (m = 16, ef_construction = 64)
-  ```
+With cosine: Both compared by semantic meaning
+With L2: Long snippet penalised for length
 
-  **Medium (10k-50k chunks):** Increase quality
-  ```sql
-  WITH (m = 24, ef_construction = 100)
-  ```
+#### 2. Bedrock Titan Embeddings
 
-  **Large (50k+ chunks):** Maximum accuracy
-  ```sql
-  WITH (m = 32, ef_construction = 128)
-  ```
+- Titan embeddings are normalised
+- Designed for cosine similarity
 
-  **Very large (1M+ chunks):** Consider IVFFlat
-  ```sql
-  USING ivfflat (embedding vector_cosine_ops)
-  WITH (lists = 1000)
-  ```
+#### 3. Semantic Search
 
-  ---
+- Query: "REST endpoint handler"
+- Should match: `@RestController` classes
+- Direction matters, not magnitude
 
-  ## Summary
+---
 
-  **Best practice for code search:**
-  - ✅ Use **HNSW** (accurate, fast, no training)
-  - ✅ Use **Cosine distance** (length-invariant, semantic)
-  - ✅ Parameters: `m = 16, ef_construction = 64` (proven defaults)
-  - ✅ Scale up parameters as codebase grows
+### Current Implementation
 
-  **Your current setup is optimal for code vectorisation!** 🚀
+**In `pgvector_store.py:64`:**
+
+```python
+CREATE INDEX IF NOT EXISTS code_embeddings_embedding_idx
+ON code_embeddings
+USING hnsw (embedding vector_cosine_ops)
+WITH (m = 16, ef_construction = 64)
+```
+
+**What this means:**
+- Uses HNSW graph structure
+- Cosine distance for similarity
+- Each node connects to 16 neighbours
+- Explores 64 candidates during build
+
+---
+
+### If Your Codebase Grows
+
+**Small (<10k chunks):** Current settings perfect
+
+```sql
+WITH (m = 16, ef_construction = 64)
+```
+
+**Medium (10k-50k chunks):** Increase quality
+
+```sql
+WITH (m = 24, ef_construction = 100)
+```
+
+**Large (50k+ chunks):** Maximum accuracy
+
+```sql
+WITH (m = 32, ef_construction = 128)
+```
+
+**Very large (1M+ chunks):** Consider IVFFlat
+
+```sql
+USING ivfflat (embedding vector_cosine_ops)
+WITH (lists = 1000)
+```
+
+---
+
+### Summary
+
+**Best practice for code search:**
+- ✅ Use **HNSW** (accurate, fast, no training)
+- ✅ Use **Cosine distance** (length-invariant, semantic)
+- ✅ Parameters: `m = 16, ef_construction = 64` (proven defaults)
+- ✅ Scale up parameters as codebase grows
+
+**Your current setup is optimal for code vectorisation!** 🚀
 
 
