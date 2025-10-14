@@ -4,6 +4,16 @@ Comprehensive documentation for the RAG (Retrieval Augmented Generation) code se
 
 ## 📚 Documentation Index
 
+### Core Modules
+- **[Bedrock Embeddings](./BEDROCK_EMBEDDINGS.md)**
+  Generate text embeddings using Amazon Bedrock Titan models
+
+- **[Database Configuration](./CONFIG.md)**
+  PostgreSQL connection setup and environment configuration
+
+- **[Vector Store](./PGVECTOR_STORE.md)**
+  Store and search embeddings using PostgreSQL with pgvector
+
 ### Core Concepts
 1. **[How Vector Search Works](./qna/01_vector_search_workflow.md)**
    Understanding how agents search for content using embeddings and semantic similarity
@@ -62,6 +72,9 @@ Each Q&A document follows this structure:
 ```
 docs/
 ├── README.md                          # This file (main navigation)
+├── BEDROCK_EMBEDDINGS.md              # Bedrock Titan embeddings module
+├── CONFIG.md                          # Database configuration module
+├── PGVECTOR_STORE.md                  # PostgreSQL vector store module
 ├── METADATA_FIELDS.md                 # Metadata schema reference
 ├── STRANDS_USAGE.md                   # Strands framework usage
 └── qna/                               # Q&A documents by topic
