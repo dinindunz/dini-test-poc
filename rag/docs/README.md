@@ -1,71 +1,74 @@
 # RAG System Documentation
 
-Comprehensive documentation for the RAG (Retrieval Augmented Generation) code search system.
+**Code search powered by semantic embeddings and vector similarity**
+
+---
+
+## 🎯 What This System Does
+
+This RAG (Retrieval Augmented Generation) system enables AI agents to search and understand your codebase through three core capabilities:
+
+### 1️⃣ **Chunk** - Break code into semantic units
+Parse codebases using tree-sitter AST analysis to extract classes, methods, API definitions, and documentation into meaningful chunks with rich metadata.
+
+**→** [Scripts Guide](./SCRIPTS_GUIDE.md) - Shell scripts for chunking code
+
+### 2️⃣ **Vectorise** - Convert code to embeddings
+Transform code chunks into 1024-dimensional vectors using Amazon Bedrock Titan embeddings, then store in PostgreSQL with pgvector for fast similarity search.
+
+**→** [Bedrock Embeddings](./BEDROCK_EMBEDDINGS.md) - Generate embeddings
+**→** [Vector Store](./PGVECTOR_STORE.md) - Store and index embeddings
+
+### 3️⃣ **Retrieve** - Search by semantic meaning
+Query the vector database using natural language to find relevant code examples. Combine vector similarity with metadata filters for precise results.
+
+**→** [Strands Usage Guide](./STRANDS_USAGE.md) - AI agent integration
+**→** [Retrievals Guide](./RETRIEVALS_GUIDE.md) - Retrieval testing and accuracy
+
+---
 
 ## 📚 Documentation Index
 
 ### Core Modules
-- **[Bedrock Embeddings](./BEDROCK_EMBEDDINGS.md)**
-  Generate text embeddings using Amazon Bedrock Titan models
-
-- **[Database Configuration](./CONFIG.md)**
-  PostgreSQL connection setup and environment configuration
-
-- **[Vector Store](./PGVECTOR_STORE.md)**
-  Store and search embeddings using PostgreSQL with pgvector
+- **[Bedrock Embeddings](./BEDROCK_EMBEDDINGS.md)** - Generate text embeddings using Amazon Bedrock Titan models
+- **[Database Configuration](./CONFIG.md)** - PostgreSQL connection setup and environment configuration
+- **[Vector Store](./PGVECTOR_STORE.md)** - Store and search embeddings using PostgreSQL with pgvector
+- **[Scripts Guide](./SCRIPTS_GUIDE.md)** - Shell scripts and Python modules for chunking and vectorisation
+- **[Retrievals Guide](./RETRIEVALS_GUIDE.md)** - Testing and iterating on retrieval accuracy
+- **[Metadata Fields Reference](./METADATA_FIELDS.md)** - Metadata schema for code chunks
+- **[Strands Usage Guide](./STRANDS_USAGE.md)** - Strands agent framework integration
 
 ### Core Concepts
-1. **[How Vector Search Works](./qna/01_vector_search_workflow.md)**
-   Understanding how agents search for content using embeddings and semantic similarity
-
-2. **[Metadata vs Content](./qna/02_metadata_role.md)**
-   The role of metadata in filtering and organising search results
-
-3. **[Top-K Selection](./qna/03_top_k_selection.md)**
-   How vector search determines which code chunks to send to the LLM
+1. **[How Vector Search Works](./qna/01_vector_search_workflow.md)** - Understanding semantic similarity search
+2. **[Metadata vs Content](./qna/02_metadata_role.md)** - Role of metadata in filtering results
+3. **[Top-K Selection](./qna/03_top_k_selection.md)** - Choosing how many results to retrieve
 
 ### Implementation Details
-4. **[Metadata in Embeddings](./qna/04_metadata_in_embeddings.md)**
-   Should rich metadata be included in vectorised content? Tradeoffs explained
-
-5. **[Tree-sitter Parsing](./qna/05_tree_sitter_parsing.md)**
-   Understanding AST parsing with source code vs compiled binaries
-
-6. **[pgvector Indexing Strategies](./qna/06_pgvector_indexing.md)**
-   IVFFlat vs HNSW - which is best for code search?
+4. **[Metadata in Embeddings](./qna/04_metadata_in_embeddings.md)** - What to include in vectorised content
+5. **[Tree-sitter Parsing](./qna/05_tree_sitter_parsing.md)** - AST parsing for code chunking
+6. **[pgvector Indexing Strategies](./qna/06_pgvector_indexing.md)** - IVFFlat vs HNSW indexing
 
 ### Advanced Techniques
-7. **[Weighted Vector Boosting](./qna/07_weighted_boosting.md)**
-   Applying weights to prioritise specific code chunks in search results
+7. **[Weighted Vector Boosting](./qna/07_weighted_boosting.md)** - Prioritising specific code chunks in results
 
 ---
 
-## 🚀 Quick Links
+## 🚀 Quick Start
 
-- [Scripts Guide](./SCRIPTS_GUIDE.md) - Shell scripts and Python modules for chunking and vectorisation
-- [Retrievals Guide](./RETRIEVALS_GUIDE.md) - Testing and iterating on retrieval accuracy
-- [Metadata Fields Reference](./METADATA_FIELDS.md)
-- [Strands Usage Guide](./STRANDS_USAGE.md)
+```bash
+# 1. Chunk your code
+cd scripts
+./chunk_code.sh
 
----
+# 2. Vectorise and store
+./vectorise_data.sh
 
-## 📖 How to Use This Documentation
+# 3. Test retrieval
+cd ../strands-agent
+python strands_example.py
+```
 
-Each Q&A document follows this structure:
-- **Question**: Clear, specific question
-- **Quick Answer**: Direct answer in the opening paragraph
-- **Detailed Explanation**: In-depth explanation with examples
-- **Code Examples**: Practical implementation snippets
-- **Visual Diagrams**: Where applicable
-
----
-
-## 🔄 Navigation Tips
-
-- Use the **Documentation Index** above to jump to specific topics
-- Each document is self-contained and can be read independently
-- Code examples are provided in Python with SQL where relevant
-- All examples use Australian English spelling
+**→** See [Scripts Guide](./SCRIPTS_GUIDE.md) for detailed instructions
 
 ---
 
