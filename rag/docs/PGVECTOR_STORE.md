@@ -1,6 +1,6 @@
 # PostgreSQL Vector Store Module
 
-**Module:** `rag/core/pgvector_store.py`
+**Module:** `core/pgvector_store.py`
 
 [← Back to Documentation Index](./README.md)
 
@@ -542,24 +542,6 @@ records = [(c["content"], c["embedding"], c["metadata"]) for c in chunks]
 store.insert_embeddings_batch(records)
 ```
 
-**Speed improvement:** ~10x faster for 100+ embeddings
-
-### Index Build Time
-
-- HNSW index builds during `CREATE INDEX` (may take time for large datasets)
-- For 1k chunks: ~1-2 seconds
-- For 10k chunks: ~10-20 seconds
-- For 100k chunks: ~2-5 minutes
-
-### Search Speed
-
-With HNSW index:
-- 1k chunks: <10ms
-- 10k chunks: <50ms
-- 100k chunks: <200ms
-
-Without index (sequential scan): 100x slower
-
 ## Error Handling
 
 ```python
@@ -613,6 +595,10 @@ except Exception as e:
 
 ---
 
-**Module Location:** `rag/core/pgvector_store.py`
+**Module Location:** `core/pgvector_store.py`
 **Dependencies:** `psycopg2`, `pgvector`, `numpy`
 **PostgreSQL Extension Required:** `pgvector`
+
+---
+
+**Last Updated**: 2025-10-16

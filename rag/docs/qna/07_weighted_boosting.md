@@ -274,7 +274,7 @@ elif "business logic" in query:
 
 ### Summary
 
-**Recommended approach for your RAG system:**
+**Recommended approach for this RAG system:**
 - Use **Approach #1: Metadata-based Reranking**
 - Over-retrieve results (e.g., top_k=20)
 - Apply boost multipliers based on layer, file_type, annotations

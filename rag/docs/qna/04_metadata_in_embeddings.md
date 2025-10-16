@@ -6,8 +6,6 @@
 
 ---
 
-When vectorising code, should rich metadata (annotations, class names, layers) be included in the embedded content, or only stored as filterable metadata? What are the tradeoffs of each approach?
-
 Rich metadata (annotations, class names, layers) should be included in the embedded content for better semantic search, while also being stored as filterable metadata for hybrid search. This is the industry best practice for code RAG systems. Here are the tradeoffs:
 
 ### Two Approaches to Code Vectorisation
@@ -74,9 +72,9 @@ Uses rich context including:
 
 #### 3. Semantic Code Search Research
 
-Papers show that including architectural markers (annotations, class names, HTTP methods) improves retrieval accuracy by 20-40%.
+Papers show that including architectural markers (annotations, class names, HTTP methods) improves retrieval accuracy.
 
-### Recommended Approach for Your Use Case
+### Recommended Approach for this Use Case
 
 Keep Approach 2 (rich context) BUT be strategic about what to include:
 
@@ -155,8 +153,6 @@ Including them in embeddings allows queries like:
 
 ### Bottom Line
 
-Your current implementation is correct and follows best practices. The metadata you're embedding has high semantic value for code search. This is the right approach for a Spring Boot codebase.
+Current implementation follows best practices. The metadata you're embedding has high semantic value for code search. This is the right approach for a Spring Boot codebase.
 
-**The key principle:** Include metadata that has semantic meaning, exclude pure identifiers. You're doing exactly that.
-
-
+**The key principle:** Include metadata that has semantic meaning, exclude pure identifiers.

@@ -6,7 +6,7 @@
 
 ---
 
-Explain pgvector indexing strategies: IVFFlat vs HNSW, and which is best for code search
+Explain pgvector indexing strategies: IVFFlat vs HNSW, and which is best for code search?
 
 HNSW (Hierarchical Navigable Small World) is best for code search due to its high accuracy and fast queries for small-to-medium datasets, while IVFFlat is better for very large datasets (100k+ vectors). Here's a detailed comparison:
 
@@ -156,7 +156,6 @@ L2 distance: 0.693 (penalised for magnitude difference)
 
 **Your use case:**
 - Vectorising codebase (Spring Boot Java)
-- Current: ~30 chunks, expected growth: 1k-10k chunks
 - Need: High accuracy code retrieval
 
 **Reasons for HNSW:**
@@ -278,7 +277,3 @@ WITH (lists = 1000)
 - ✅ Use **Cosine distance** (length-invariant, semantic)
 - ✅ Parameters: `m = 16, ef_construction = 64` (proven defaults)
 - ✅ Scale up parameters as codebase grows
-
-**Your current setup is optimal for code vectorisation!** 🚀
-
-

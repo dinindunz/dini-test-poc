@@ -1,6 +1,6 @@
 # Database Configuration Module
 
-**Module:** `rag/core/config.py`
+**Module:** `core/config.py`
 
 [← Back to Documentation Index](./README.md)
 
@@ -260,34 +260,6 @@ except psycopg2.OperationalError as e:
     # 4. Is pgvector extension installed?
 ```
 
-**Common Errors:**
-
-1. **Connection Refused:**
-   ```
-   psycopg2.OperationalError: could not connect to server: Connection refused
-   ```
-   **Solution:** Start PostgreSQL service: `brew services start postgresql@14`
-
-2. **Authentication Failed:**
-   ```
-   psycopg2.OperationalError: FATAL: password authentication failed for user "postgres"
-   ```
-   **Solution:** Check `DB_PASSWORD` environment variable
-
-3. **Database Does Not Exist:**
-   ```
-   psycopg2.OperationalError: FATAL: database "vectordb" does not exist
-   ```
-   **Solution:** Create database: `createdb vectordb`
-
-## Best Practices
-
-1. **Use Environment Variables:** Never hardcode credentials in code
-2. **Separate Configs:** Use different `.env` files for dev/staging/prod
-3. **Secure Storage:** Use secrets managers (AWS Secrets Manager, etc.) in production
-4. **Connection Pooling:** Consider using connection pooling for production workloads
-5. **Validate Early:** Test database connection at application startup
-
 ## Related Documentation
 
 - [Bedrock Embeddings](./BEDROCK_EMBEDDINGS.md) - Generating text embeddings
@@ -296,5 +268,9 @@ except psycopg2.OperationalError as e:
 
 ---
 
-**Module Location:** `rag/core/config.py`
+**Module Location:** `core/config.py`
 **Dependencies:** `python-dotenv`
+
+---
+
+**Last Updated**: 2025-10-16

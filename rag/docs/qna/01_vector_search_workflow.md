@@ -6,8 +6,6 @@
 
 ---
 
-How an agent searches for content for a user query.
-
 An agent searches by converting the user query into an embedding vector and performing semantic similarity search against stored code embeddings. Here is the complete workflow:
 
 ### 🔍 How Vector Search Works
@@ -131,7 +129,7 @@ LIMIT 5;
 **Agent's Prompt to LLM:**
 
 ```text
-Here are relevant code examples from your codebase:
+Here are relevant code examples from codebase:
 
 Example 1 (similarity: 0.94):
 File: SampleController.java
@@ -156,11 +154,11 @@ To create a REST controller in Spring Boot, use @RestController annotation:
 
 ```java
 @RestController
-@RequestMapping("/api/yourpath")
-public class YourController {
+@RequestMapping("/api/path")
+public class TestController {
     @GetMapping
     public ResponseType getMethod() {
-        // your logic
+        // logic
     }
 }
 ```
@@ -207,5 +205,3 @@ User Query
     ↓
 Agent Response
 ```
-
-This is called RAG (Retrieval Augmented Generation) - the agent retrieves relevant code, then generates a response based on that context! 🚀

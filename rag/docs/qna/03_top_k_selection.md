@@ -6,13 +6,11 @@
 
 ---
 
-How does the vector search determine which code chunks to send to the LLM?
-
 Vector search determines which chunks to send by calculating cosine similarity between the query embedding and all chunk embeddings, then returning only the top K most relevant results (e.g., top 5). Here's how it works in detail:
 
 ### 🎯 How Vector Search Works
 
-**Your Query:**
+**Query:**
 
 "Generate the code for java hello world springboot application"
 
@@ -120,7 +118,7 @@ Best practice: 3-10 most relevant chunks
 
 ### 🔧 Configurable Top K
 
-When you build your retrieval agent, you can adjust:
+When you build the retrieval agent, you can adjust:
 
 ```python
 # Very specific query - need fewer examples
@@ -163,7 +161,7 @@ Top results:
 ❌ SampleController.java                  - 0.30 (NOT sent)
 ```
 
-### 🎯 Your Specific Case
+### 🎯 Sample Specific Case
 
 For "generate java hello world springboot application":
 
@@ -191,7 +189,3 @@ For "generate java hello world springboot application":
 | Chunks ignored          | 24 chunks (low similarity)   |
 
 **Key Point:** Vector search is about selective retrieval based on semantic relevance, not dumping everything into the LLM! 🎯
-
-This is what makes RAG powerful - you get the right context, not all context.
-
-

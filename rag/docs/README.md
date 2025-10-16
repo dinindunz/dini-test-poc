@@ -42,6 +42,8 @@ Comprehensive documentation for the RAG (Retrieval Augmented Generation) code se
 
 ## 🚀 Quick Links
 
+- [Scripts Guide](./SCRIPTS_GUIDE.md) - Shell scripts and Python modules for chunking and vectorisation
+- [Retrievals Guide](./RETRIEVALS_GUIDE.md) - Testing and iterating on retrieval accuracy
 - [Metadata Fields Reference](./METADATA_FIELDS.md)
 - [Strands Usage Guide](./STRANDS_USAGE.md)
 
@@ -75,6 +77,8 @@ docs/
 ├── BEDROCK_EMBEDDINGS.md              # Bedrock Titan embeddings module
 ├── CONFIG.md                          # Database configuration module
 ├── PGVECTOR_STORE.md                  # PostgreSQL vector store module
+├── SCRIPTS_GUIDE.md                   # Scripts and Python modules guide
+├── RETRIEVALS_GUIDE.md                # Retrieval testing and iterations
 ├── METADATA_FIELDS.md                 # Metadata schema reference
 ├── STRANDS_USAGE.md                   # Strands framework usage
 └── qna/                               # Q&A documents by topic
@@ -89,4 +93,4 @@ docs/
 
 ---
 
-**Last Updated**: 2025-10-14
+**Last Updated**: 2025-10-16

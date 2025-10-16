@@ -1,5 +1,7 @@
 # Metadata Fields Reference
 
+**[← Back to Main Documentation](./README.md)**
+
 This document describes all metadata fields stored in the vector database for code chunks.
 
 ## Core Fields (All Chunk Types)
@@ -127,3 +129,7 @@ LIMIT 5
 ```
 
 This provides both semantic understanding ("find code similar to REST controllers") and precise filtering ("only Java controller layer classes").
+
+---
+
+**Last Updated**: 2025-10-16

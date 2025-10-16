@@ -1,6 +1,6 @@
 # Bedrock Embeddings Module
 
-**Module:** `rag/core/bedrock_embeddings.py`
+**Module:** `core/bedrock_embeddings.py`
 
 [← Back to Documentation Index](./README.md)
 
@@ -13,7 +13,6 @@ The `BedrockEmbeddingGenerator` class provides a Python interface for generating
 ## Features
 
 - ✅ Support for multiple Titan embedding models
-- ✅ Automatic AWS credential management from environment variables
 - ✅ Batch processing with configurable batch sizes
 - ✅ Normalised embeddings for cosine similarity
 - ✅ Error handling with fallback strategies
@@ -33,20 +32,8 @@ embedder = BedrockEmbeddingGenerator()
 embedder = BedrockEmbeddingGenerator(
     model_id="amazon.titan-embed-text-v2:0",
     region="ap-southeast-2",
-    aws_access_key_id="your-key",
-    aws_secret_access_key="your-secret"
 )
 ```
-
-### Constructor Parameters
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `model_id` | `str` | `"amazon.titan-embed-text-v2:0"` | Bedrock embedding model identifier |
-| `region` | `str` | `"ap-southeast-2"` | AWS region (from `AWS_REGION` env var) |
-| `aws_access_key_id` | `str` | `None` | AWS access key (from `AWS_ACCESS_KEY_ID` env var) |
-| `aws_secret_access_key` | `str` | `None` | AWS secret key (from `AWS_SECRET_ACCESS_KEY` env var) |
-| `aws_session_token` | `str` | `None` | AWS session token (from `AWS_SESSION_TOKEN` env var) |
 
 ## Methods
 
@@ -143,27 +130,6 @@ dim = embedder.get_dimension()
 
 print(f"Model dimension: {dim}")
 # Output: Model dimension: 1024
-```
-
-## Environment Variables
-
-The module reads AWS credentials and configuration from environment variables:
-
-```bash
-# AWS Configuration
-AWS_REGION=ap-southeast-2
-AWS_ACCESS_KEY_ID=your-access-key-id
-AWS_SECRET_ACCESS_KEY=your-secret-access-key
-AWS_SESSION_TOKEN=your-session-token  # Optional
-```
-
-Create a `.env` file in your project root:
-
-```bash
-# .env
-AWS_REGION=ap-southeast-2
-AWS_ACCESS_KEY_ID=AKIAIOSFODNN7EXAMPLE
-AWS_SECRET_ACCESS_KEY=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 ```
 
 ## Complete Usage Example
@@ -263,26 +229,6 @@ except Exception as e:
     # Handle error (retry, log, etc.)
 ```
 
-**Common Errors:**
-
-1. **AWS Credentials Not Found:**
-   ```
-   ❌ Error generating embedding: Unable to locate credentials
-   ```
-   **Solution:** Set `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables
-
-2. **Model Not Found:**
-   ```
-   ❌ Error generating embedding: Could not resolve model ID
-   ```
-   **Solution:** Check the `model_id` parameter matches available Bedrock models
-
-3. **Rate Limiting:**
-   ```
-   ❌ Failed to generate embedding for text (index 42): ThrottlingException
-   ```
-   **Solution:** Reduce `batch_size` or add retry logic
-
 ## Performance Considerations
 
 ### Batch Size
@@ -307,11 +253,9 @@ embeddings = embedder.generate_batch(
 
 ## Best Practices
 
-1. **Use Environment Variables:** Store AWS credentials in `.env` file, not in code
-2. **Batch Processing:** Use `generate_batch()` for multiple texts (more efficient)
-3. **Error Handling:** Wrap API calls in try-except blocks
-4. **Normalisation:** Keep `normalize=True` for vector search use cases
-5. **Model Selection:** Use `amazon.titan-embed-text-v2:0` for code embeddings (1024-dim, faster)
+1. **Batch Processing:** Use `generate_batch()` for multiple texts (more efficient)
+2. **Normalisation:** Keep `normalize=True` for vector search use cases
+3. **Model Selection:** Use `amazon.titan-embed-text-v2:0` for code embeddings (1024-dim, faster)
 
 ## Related Documentation
 
@@ -321,5 +265,9 @@ embeddings = embedder.generate_batch(
 
 ---
 
-**Module Location:** `rag/core/bedrock_embeddings.py`
+**Module Location:** `core/bedrock_embeddings.py`
 **Dependencies:** `boto3`, `python-dotenv`
+
+---
+
+**Last Updated**: 2025-10-16

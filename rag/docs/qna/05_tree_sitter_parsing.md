@@ -223,5 +223,3 @@ We use these properties to:
 **Tree-sitter is like a "smart code parser"** that understands programming language grammar, similar to how an HTML parser understands HTML tags!
 
 It works with **human-readable source code**, not compiled binaries. This is why we can extract exact code snippets and understand the structure - we're working with the original text file, just organised into a tree for easy navigation.
-
-

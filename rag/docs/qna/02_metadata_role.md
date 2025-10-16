@@ -6,8 +6,6 @@
 
 ---
 
-What is the role of metadata here? Only content is vectorised.
-
 Metadata serves as structured filters for pre-filtering and post-filtering search results, while only content gets vectorised for semantic similarity. Here's the distinct role of each:
 
 ### 🎯 Clear Separation of Concerns
@@ -173,21 +171,6 @@ ORDER BY
 LIMIT 5;
 ```
 
-### ⚡ Performance Benefit
-
-```
-❌ Without metadata filtering:
-Vector search: 10,000 chunks → 2.5 seconds
-Post-filter: 10,000 → 50 results
-
-✅ With metadata filtering:
-Pre-filter: 10,000 → 500 chunks (metadata index)
-Vector search: 500 chunks → 0.3 seconds
-Results: 50 results
-
-Speed improvement: 8x faster! 🚀
-```
-
 ### 🎯 Summary
 
 | Aspect      | Content (Vectorised)               | Metadata (Not Vectorised) |
@@ -203,5 +186,3 @@ Speed improvement: 8x faster! 🚀
 - Metadata = Advanced filters (file type, date, site, etc.)
 
 **Both together = Powerful hybrid search! 🎉**
-
-
