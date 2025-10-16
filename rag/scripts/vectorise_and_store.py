@@ -17,6 +17,7 @@ try:
     # Try relative imports (when run as module)
     from ..core.bedrock_embeddings import BedrockEmbeddingGenerator
     from ..core.pgvector_store import PgVectorStore
+    from ..core.s3_vector_store import S3VectorStore
     from ..core.config import DatabaseConfig
 except ImportError:
     # Fall back to direct imports (when run as script)
@@ -25,6 +26,7 @@ except ImportError:
     sys.path.insert(0, str(Path(__file__).parent.parent))
     from core.bedrock_embeddings import BedrockEmbeddingGenerator
     from core.pgvector_store import PgVectorStore
+    from core.s3_vector_store import S3VectorStore
     from core.config import DatabaseConfig
 
 
@@ -171,17 +173,21 @@ def vectorise_and_store(
     model_id: str = "amazon.titan-embed-text-v2:0",
     table_name: str = "code_embeddings",
     batch_size: int = 25,
-    clear_existing: bool = False
+    clear_existing: bool = False,
+    vector_store_type: str = "pgvector",
+    s3_bucket_name: str = None
 ):
     """
-    Main function to vectorise chunks and store in database
+    Main function to vectorise chunks and store in vector database
 
     Args:
         chunks_file: Path to chunks JSON file
         model_id: Bedrock embedding model ID
-        table_name: Database table name
+        table_name: Database table name (for pgvector) or index name (for S3)
         batch_size: Number of chunks to process in each batch
         clear_existing: Whether to clear existing data before inserting
+        vector_store_type: Type of vector store - "pgvector" or "s3" (default: "pgvector")
+        s3_bucket_name: S3 bucket name (required if vector_store_type is "s3")
     """
     print("\n🚀 Starting vectorisation and storage process\n")
 
@@ -198,14 +204,30 @@ def vectorise_and_store(
     embedding_dimension = embedder.get_dimension()
     print(f"📊 Embedding dimension: {embedding_dimension}")
 
-    # Initialise database connection
-    print("\n🗄️  Connecting to PostgreSQL database")
-    db_config = DatabaseConfig()
-    vector_store = PgVectorStore(config=db_config, table_name=table_name)
-    vector_store.connect()
+    # Initialise vector store based on type
+    print(f"\n🗄️  Initialising {vector_store_type.upper()} vector store")
 
-    # Initialise schema
-    vector_store.initialise_schema(dimension=embedding_dimension)
+    if vector_store_type == "pgvector":
+        # PostgreSQL with pgvector
+        db_config = DatabaseConfig()
+        vector_store = PgVectorStore(config=db_config, table_name=table_name)
+        vector_store.connect()
+        vector_store.initialise_schema(dimension=embedding_dimension)
+
+    elif vector_store_type == "s3":
+        # Amazon S3 Vectors
+        if not s3_bucket_name:
+            raise ValueError("s3_bucket_name is required when vector_store_type is 's3'")
+
+        vector_store = S3VectorStore(
+            bucket_name=s3_bucket_name,
+            index_name=table_name  # Use table_name as index_name for consistency
+        )
+        vector_store.connect()
+        vector_store.initialise_schema(dimension=embedding_dimension, distance_metric="cosine")
+
+    else:
+        raise ValueError(f"Unsupported vector_store_type: {vector_store_type}. Use 'pgvector' or 's3'")
 
     # Clear existing data if requested
     if clear_existing:
@@ -333,6 +355,20 @@ def main():
         help="Clear existing data before inserting"
     )
 
+    parser.add_argument(
+        "--vector-store",
+        type=str,
+        choices=["pgvector", "s3"],
+        default="pgvector",
+        help="Vector store type: pgvector (PostgreSQL) or s3 (Amazon S3 Vectors) (default: pgvector)"
+    )
+
+    parser.add_argument(
+        "--s3-bucket",
+        type=str,
+        help="S3 bucket name (required when --vector-store=s3)"
+    )
+
     args = parser.parse_args()
 
     # Run vectorisation
@@ -341,7 +377,9 @@ def main():
         model_id=args.model_id,
         table_name=args.table_name,
         batch_size=args.batch_size,
-        clear_existing=args.clear
+        clear_existing=args.clear,
+        vector_store_type=args.vector_store,
+        s3_bucket_name=args.s3_bucket
     )
 
 

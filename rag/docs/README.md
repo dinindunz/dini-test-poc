@@ -11,8 +11,11 @@ Comprehensive documentation for the RAG (Retrieval Augmented Generation) code se
 - **[Database Configuration](./CONFIG.md)**
   PostgreSQL connection setup and environment configuration
 
-- **[Vector Store](./PGVECTOR_STORE.md)**
+- **[PostgreSQL Vector Store](./PGVECTOR_STORE.md)**
   Store and search embeddings using PostgreSQL with pgvector
+
+- **[S3 Vector Store](./S3_VECTOR_STORE.md)**
+  Store and search embeddings using Amazon S3 Vectors
 
 ### Core Concepts
 1. **[How Vector Search Works](./qna/01_vector_search_workflow.md)**
@@ -38,10 +41,14 @@ Comprehensive documentation for the RAG (Retrieval Augmented Generation) code se
 7. **[Weighted Vector Boosting](./qna/07_weighted_boosting.md)**
    Applying weights to prioritise specific code chunks in search results
 
+8. **[S3 Vectors Metadata Limitations](./qna/08_s3_vectors_metadata_limits.md)**
+   Understanding and working with S3 Vectors' 10-key and 2048-byte metadata limits
+
 ---
 
 ## 🚀 Quick Links
 
+- [Vectorisation Scripts](../scripts/README.md) - Shell scripts for easy vectorisation
 - [Metadata Fields Reference](./METADATA_FIELDS.md)
 - [Strands Usage Guide](./STRANDS_USAGE.md)
 
@@ -75,6 +82,7 @@ docs/
 ├── BEDROCK_EMBEDDINGS.md              # Bedrock Titan embeddings module
 ├── CONFIG.md                          # Database configuration module
 ├── PGVECTOR_STORE.md                  # PostgreSQL vector store module
+├── S3_VECTOR_STORE.md                 # Amazon S3 vector store module
 ├── METADATA_FIELDS.md                 # Metadata schema reference
 ├── STRANDS_USAGE.md                   # Strands framework usage
 └── qna/                               # Q&A documents by topic
@@ -84,9 +92,10 @@ docs/
     ├── 04_metadata_in_embeddings.md
     ├── 05_tree_sitter_parsing.md
     ├── 06_pgvector_indexing.md
-    └── 07_weighted_boosting.md
+    ├── 07_weighted_boosting.md
+    └── 08_s3_vectors_metadata_limits.md
 ```
 
 ---
 
-**Last Updated**: 2025-10-14
+**Last Updated**: 2025-10-16

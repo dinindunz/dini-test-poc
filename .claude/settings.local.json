@@ -12,7 +12,10 @@
       "Bash(git rm:*)",
       "Bash(git add:*)",
       "Read(///**)",
-      "Bash(awk:*)"
+      "Bash(awk:*)",
+      "WebSearch",
+      "WebFetch(domain:boto3.amazonaws.com)",
+      "Bash(python:*)"
     ],
     "deny": [],
     "ask": []
