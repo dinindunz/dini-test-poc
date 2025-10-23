@@ -14,6 +14,6 @@ msgpack>=1.0.0
 fastapi
 psycopg2-binary
 pgvector
-openai
+openai>=1.0.0
 boto3
 tqdm
