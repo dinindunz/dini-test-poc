@@ -3,6 +3,7 @@ import json
 from datetime import datetime
 from strands import Agent
 from strands.models.litellm import LiteLLMModel
+from strands.models.bedrock import BedrockModel
 from strands_tools import shell, file_read, file_write, editor
 from tools.code_analyser import ai_agent_tools
 from strands.tools.mcp import MCPClient
@@ -147,18 +148,37 @@ def load_system_prompt(prompt_name=None):
     except Exception:
         return "You are a helpful AI assistant.", None
 
-model = LiteLLMModel(
-    client_args={
-        "api_base": os.getenv("API_BASE"),
-        "api_key": os.getenv("API_KEY"),
-    },
-    model_id="openai/au-claude-3.5-sonnet",
-    params={
-        "max_tokens": 8000,
-        "temperature": 0.1,
-        "cache": False,
-    }
-)
+def select_model_provider():
+    """Interactive model provider selection"""
+    print("🤖 Select Model Provider:")
+    print("  1. LiteLLM (Mantel AI Gateway)")
+    print("  2. AWS Bedrock")
+
+    choice = input("Select model provider: ").strip()
+
+    if choice == "1":
+        print("✅ Using LiteLLM model")
+        return LiteLLMModel(
+            client_args={
+                "base_url": os.getenv("API_BASE"),
+                "api_key": os.getenv("API_KEY"),
+            },
+            model_id="openai/au-claude-4.5-sonnet",
+            params={
+                "max_tokens": 8000,
+                "temperature": 0.1,
+            }
+        )
+    elif choice == "2":
+        print("✅ Using Bedrock model")
+        return BedrockModel(
+            model_id="apac.anthropic.claude-sonnet-4-20250514-v1:0",
+        )
+    else:
+        choice = input("Invalid choice, Select model provider: ").strip()
+
+# Select model provider first
+model = select_model_provider()
 
 code_index_mcp_client = MCPClient(lambda: stdio_client(
     StdioServerParameters(
@@ -214,6 +234,16 @@ agent = Agent(
 
 class InvokeRequest(BaseModel):
     prompt: str
+    use_structured_output: bool = True
+
+
+class AnalysisResponse(BaseModel):
+    """Structured response for text analysis"""
+    sentiment: str  # positive, negative, neutral
+    tone: str  # formal, casual, technical, etc.
+    summary: str
+    key_points: list[str]
+
 
 @app.post("/invoke")
 async def invoke_agent(request: InvokeRequest):
@@ -246,10 +276,18 @@ async def invoke_agent(request: InvokeRequest):
             })
 
         else:
-            # Standard agent invocation
-            result = agent(request.prompt)
-            message_text = result.message.get('content', [{}])[0].get('text', str(result.message))
-            metrics_summary = result.metrics.get_summary()
+            # Check if structured output is requested
+            if request.use_structured_output:
+                # Use structured output - this returns the structured object directly
+                structured_data = agent.structured_output(AnalysisResponse, request.prompt)
+                message_text = json.dumps(structured_data.model_dump(), indent=2)
+                # Structured output doesn't return metrics, so create empty metrics
+                metrics_summary = {}
+            else:
+                # Standard agent invocation
+                result = agent(request.prompt)
+                message_text = result.message.get('content', [{}])[0].get('text', str(result.message))
+                metrics_summary = result.metrics.get_summary()
 
         # Save metrics to log file
         log_file_path = save_metrics_log(request.prompt, metrics_summary, effective_prompt_name, INCLUDE_TRACES_CONTENT)
