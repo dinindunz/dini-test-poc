@@ -4,6 +4,7 @@ from datetime import datetime
 from strands import Agent
 from strands.models.litellm import LiteLLMModel
 from strands.models.bedrock import BedrockModel
+from strands.models.openai import OpenAIModel
 from strands_tools import shell, file_read, file_write, editor
 from tools.code_analyser import ai_agent_tools
 from strands.tools.mcp import MCPClient
@@ -151,8 +152,9 @@ def load_system_prompt(prompt_name=None):
 def select_model_provider():
     """Interactive model provider selection"""
     print("🤖 Select Model Provider:")
-    print("  1. LiteLLM (Mantel AI Gateway)")
+    print("  1. LiteLLM")
     print("  2. AWS Bedrock")
+    print("  3. OpenAI")
 
     choice = input("Select model provider: ").strip()
 
@@ -173,6 +175,15 @@ def select_model_provider():
         print("✅ Using Bedrock model")
         return BedrockModel(
             model_id="apac.anthropic.claude-sonnet-4-20250514-v1:0",
+        )
+    elif choice == "3":
+        print("✅ Using OpenAI model")
+        return OpenAIModel(
+            model_id="au-claude-4.5-sonnet",
+            client_args={
+                "base_url": os.getenv(f"API_BASE"),
+                "api_key": os.getenv("API_KEY"),
+            },
         )
     else:
         choice = input("Invalid choice, Select model provider: ").strip()
