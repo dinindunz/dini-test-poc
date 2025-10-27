@@ -6,3 +6,4 @@ __pycache__
 CLAUDE.md
 sample-spring-boot
 litellm/litellm_config.yaml
+logs/summarisation/

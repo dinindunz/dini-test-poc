@@ -1,5 +1,5 @@
-strands-agents
-strands-agents-tools
+strands-agents=1.13.0
+strands-agents-tools=0.1.8
 strands-agents[litellm]
 bedrock-agentcore
 bedrock-agentcore-starter-toolkit

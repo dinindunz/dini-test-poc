@@ -14,7 +14,14 @@
       "Read(///**)",
       "Bash(awk:*)",
       "Bash(curl:*)",
-      "WebSearch"
+      "WebSearch",
+      "WebFetch(domain:strandsagents.com)",
+      "Bash(pip3 show:*)",
+      "Bash(pip3 install:*)",
+      "Bash(cat:*)",
+      "Bash(python -m pip:*)",
+      "Bash(python:*)",
+      "Bash(jq:*)"
     ],
     "deny": [],
     "ask": []

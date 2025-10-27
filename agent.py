@@ -237,15 +237,29 @@ else:
 
 app = FastAPI()
 
+# Import the hook-based summarisation system
+from context_manager.summarisation_hooks import ProactiveSummarisationHooks
+
+# Create the summarisation hooks
+summarisation_hooks = ProactiveSummarisationHooks(
+    token_threshold=2000,  # Summarise when reaching 50k tokens (good balance for production)
+    summary_ratio=0.4,      # Summarise 40% of messages (more aggressive)
+    preserve_recent_messages=10,  # Always keep last 10 messages (recent context important)
+    summarisation_system_prompt="You are an expert assistant. Create a concise bullet-point summary focusing ONLY on key decisions, code changes, and unresolved issues. Be extremely brief.",
+    verbose=True,  # Enable verbose logging
+)
+
 agent = Agent(
     system_prompt=system_prompt,
     model=model,
-    tools=[shell, file_read, file_write, editor] + code_index_tools
+    tools=[shell, file_read, file_write, editor] + code_index_tools,
+    hooks=[summarisation_hooks]  # Pass hooks to trigger summarisation during the loop!
 )
 
 class InvokeRequest(BaseModel):
     prompt: str
-    use_structured_output: bool = True
+    use_structured_output: bool = False
+    custom_conversation_manager: bool = True
 
 
 class AnalysisResponse(BaseModel):
@@ -295,7 +309,7 @@ async def invoke_agent(request: InvokeRequest):
                 # Structured output doesn't return metrics, so create empty metrics
                 metrics_summary = {}
             else:
-                # Standard agent invocation
+                # Standard agent invocation (conversation manager is already set on the agent)
                 result = agent(request.prompt)
                 message_text = result.message.get('content', [{}])[0].get('text', str(result.message))
                 metrics_summary = result.metrics.get_summary()
