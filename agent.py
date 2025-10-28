@@ -165,7 +165,7 @@ def select_model_provider():
                 "base_url": os.getenv("API_BASE"),
                 "api_key": os.getenv("API_KEY"),
             },
-            model_id="openai/au-claude-4.5-sonnet",
+            model_id="openai/global-claude-4.5-haiku-claude-code",
             params={
                 "max_tokens": 8000,
                 "temperature": 0.1,
@@ -179,7 +179,7 @@ def select_model_provider():
     elif choice == "3":
         print("✅ Using OpenAI model")
         return OpenAIModel(
-            model_id="au-claude-4.5-sonnet",
+            model_id="global-claude-4.5-haiku-claude-code",
             client_args={
                 "base_url": os.getenv(f"API_BASE"),
                 "api_key": os.getenv("API_KEY"),
@@ -237,24 +237,44 @@ else:
 
 app = FastAPI()
 
-# Import the hook-based summarisation system
-from context_manager.summarisation_hooks import ProactiveSummarisationHooks
+# Optional: Enable proactive summarisation (recommended for long conversations)
+# Set to True to trigger summarisation before hitting 200K context limit
+# Set to False to use Strands' default reactive summarisation (triggers only on overflow)
+USE_PROACTIVE_SUMMARISATION = True
 
-# Create the summarisation hooks
-summarisation_hooks = ProactiveSummarisationHooks(
-    token_threshold=2000,  # Summarise when reaching 50k tokens (good balance for production)
-    summary_ratio=0.4,      # Summarise 40% of messages (more aggressive)
-    preserve_recent_messages=10,  # Always keep last 10 messages (recent context important)
-    summarisation_system_prompt="You are an expert assistant. Create a concise bullet-point summary focusing ONLY on key decisions, code changes, and unresolved issues. Be extremely brief.",
-    verbose=True,  # Enable verbose logging
-)
+if USE_PROACTIVE_SUMMARISATION:
+    # Uses new implementation that wraps Strands' SummarizingConversationManager
+    # Benefits: tool pair protection, summary reuse, proactive triggering, accurate token counting
+    from context_manager.proactive_summarisation_hooks import ProactiveSummarisationHooks
 
-agent = Agent(
-    system_prompt=system_prompt,
-    model=model,
-    tools=[shell, file_read, file_write, editor] + code_index_tools,
-    hooks=[summarisation_hooks]  # Pass hooks to trigger summarisation during the loop!
-)
+    summarisation_hooks = ProactiveSummarisationHooks(
+        token_threshold=100000,  # Summarise at 100K tokens (50% of Sonnet's 200K limit)
+        summary_ratio=0.3,       # Summarise 30% of messages (Strands default)
+        preserve_recent_messages=10,  # Keep last 10 messages for context
+        summarization_system_prompt=None,  # Use Strands' default summarisation prompt
+        verbose=True,  # Enable verbose console output
+        enable_logging=True,  # Enable structured file logging to logs/summarisation/
+    )
+
+    agent = Agent(
+        system_prompt=system_prompt,
+        model=model,
+        tools=[shell, file_read, file_write, editor] + code_index_tools,
+        hooks=[summarisation_hooks]  # Proactive summarisation with hooks
+    )
+else:
+    # Use Strands' built-in reactive summarisation (triggers at context overflow)
+    from strands.agent.conversation_manager import SummarizingConversationManager
+
+    agent = Agent(
+        system_prompt=system_prompt,
+        model=model,
+        tools=[shell, file_read, file_write, editor] + code_index_tools,
+        conversation_manager=SummarizingConversationManager(
+            summary_ratio=0.3,
+            preserve_recent_messages=10,
+        )  # Reactive: triggers only when context overflows at ~200K tokens
+    )
 
 class InvokeRequest(BaseModel):
     prompt: str

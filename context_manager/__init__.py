@@ -4,13 +4,7 @@ Context Manager Package
 Intelligent context window management for long-running agent tasks.
 """
 
-from .context_manager import ContextManager, ActionRecord, ContextState
-from .context_aware_agent import ContextAwareAgent, create_context_aware_agent
-
-__all__ = [
-    'ContextManager',
-    'ActionRecord',
-    'ContextState',
-    'ContextAwareAgent',
-    'create_context_aware_agent'
-]
+# Empty __init__.py to allow imports without loading everything
+# Import specific modules as needed:
+#   from context_manager.token_counter import TokenCounter
+#   from context_manager.proactive_summarisation_hooks import ProactiveSummarisationHooks

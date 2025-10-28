@@ -1,5 +1,5 @@
-strands-agents=1.13.0
-strands-agents-tools=0.1.8
+strands-agents>=1.13.0
+strands-agents-tools>=0.1.8
 strands-agents[litellm]
 bedrock-agentcore
 bedrock-agentcore-starter-toolkit
@@ -17,3 +17,4 @@ pgvector
 openai>=1.0.0
 boto3
 tqdm
+tiktoken
