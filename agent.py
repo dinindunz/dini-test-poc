@@ -165,7 +165,7 @@ def select_model_provider():
                 "base_url": os.getenv("API_BASE"),
                 "api_key": os.getenv("API_KEY"),
             },
-            model_id="openai/global-claude-4.5-haiku-claude-code",
+            model_id="openai/au-claude-4.5-sonnet",
             params={
                 "max_tokens": 8000,
                 "temperature": 0.1,
@@ -179,7 +179,7 @@ def select_model_provider():
     elif choice == "3":
         print("✅ Using OpenAI model")
         return OpenAIModel(
-            model_id="global-claude-4.5-haiku-claude-code",
+            model_id="au-claude-4.5-sonnet",
             client_args={
                 "base_url": os.getenv(f"API_BASE"),
                 "api_key": os.getenv("API_KEY"),
@@ -245,22 +245,22 @@ USE_PROACTIVE_SUMMARISATION = True
 if USE_PROACTIVE_SUMMARISATION:
     # Uses new implementation that wraps Strands' SummarizingConversationManager
     # Benefits: tool pair protection, summary reuse, proactive triggering, accurate token counting
-    from context_manager.proactive_summarisation_hooks import ProactiveSummarisationHooks
+    from hooks.proactive_summarisation import ProactiveSummarisation
 
-    summarisation_hooks = ProactiveSummarisationHooks(
-        token_threshold=100000,  # Summarise at 100K tokens (50% of Sonnet's 200K limit)
-        summary_ratio=0.3,       # Summarise 30% of messages (Strands default)
-        preserve_recent_messages=10,  # Keep last 10 messages for context
-        summarization_system_prompt=None,  # Use Strands' default summarisation prompt
-        verbose=True,  # Enable verbose console output
-        enable_logging=True,  # Enable structured file logging to logs/summarisation/
+    proactive_summarisation_hook = ProactiveSummarisation(
+        token_threshold=1000,
+        summary_ratio=0.3,
+        preserve_recent_messages=5,
+        summarization_system_prompt=None,
+        verbose=True,
+        enable_logging=True,
     )
 
     agent = Agent(
         system_prompt=system_prompt,
         model=model,
         tools=[shell, file_read, file_write, editor] + code_index_tools,
-        hooks=[summarisation_hooks]  # Proactive summarisation with hooks
+        hooks=[proactive_summarisation_hook]  # Proactive summarisation hook
     )
 else:
     # Use Strands' built-in reactive summarisation (triggers at context overflow)

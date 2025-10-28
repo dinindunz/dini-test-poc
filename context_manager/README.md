@@ -6,11 +6,12 @@ This directory contains implementations for managing conversation context in Str
 
 ### Production Files (Use These)
 
-1. **`proactive_summarisation_hooks.py`** ⭐ **RECOMMENDED**
+1. **`hooks/proactive_summarisation.py`** ⭐ **RECOMMENDED**
    - Hybrid approach combining Strands' battle-tested logic with proactive triggering
    - Reuses `SummarizingConversationManager` methods (tool pair protection, summary reuse)
    - Triggers via `BeforeModelCallEvent` hooks at configurable token threshold
    - **Best of both worlds**: Strands' reliability + proactive cost savings
+   - **Class**: `ProactiveSummarisation` (formerly `ProactiveSummarisationHooks`)
 
 2. **`summarisation_logger.py`**
    - Structured logging system for all summarisation events
@@ -62,9 +63,9 @@ agent = Agent(
 ### Proactive Hooks (Recommended)
 
 ```python
-from context_manager.proactive_summarisation_hooks import ProactiveSummarisationHooks
+from hooks.proactive_summarisation import ProactiveSummarisation
 
-hooks = ProactiveSummarisationHooks(
+hooks = ProactiveSummarisation(
     token_threshold=100000,  # Trigger at 100K tokens
     summary_ratio=0.3,
     preserve_recent_messages=10,
@@ -101,9 +102,9 @@ In `agent.py`:
 USE_PROACTIVE_SUMMARISATION = True  # or False
 
 if USE_PROACTIVE_SUMMARISATION:
-    from context_manager.proactive_summarisation_hooks import ProactiveSummarisationHooks
+    from hooks.proactive_summarisation import ProactiveSummarisation
 
-    summarisation_hooks = ProactiveSummarisationHooks(
+    summarisation_hooks = ProactiveSummarisation(
         token_threshold=100000,
         summary_ratio=0.3,
         preserve_recent_messages=10,
@@ -164,7 +165,7 @@ summarization_agent = Agent(
     system_prompt="Create concise bullet-point summaries."
 )
 
-summarisation_hooks = ProactiveSummarisationHooks(
+summarisation_hooks = ProactiveSummarisation(
     token_threshold=100000,
     summarization_agent=summarization_agent,  # Use dedicated agent
     enable_logging=True,
@@ -180,7 +181,7 @@ custom_prompt = """Create an ultra-concise summary with:
 3. Open issues
 Maximum 5 bullet points."""
 
-summarisation_hooks = ProactiveSummarisationHooks(
+summarisation_hooks = ProactiveSummarisation(
     token_threshold=100000,
     summarization_system_prompt=custom_prompt,  # Custom prompt
     enable_logging=True,
