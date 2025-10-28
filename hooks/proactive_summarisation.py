@@ -95,9 +95,12 @@ class ProactiveSummarisation(HookProvider):
     def on_invocation_start(self, event: BeforeInvocationEvent) -> None:
         """Called at the start of each agent invocation."""
         if self.enable_logging and self.summarisation_logger:
-            invocation_id = self.summarisation_logger.start_invocation()
-            if self.verbose:
-                print(f"🆕 [Invocation] Started {invocation_id}")
+            # Only start invocation if not already started
+            # This prevents nested invocations from summarisation agent calls
+            if self.summarisation_logger.current_invocation is None:
+                invocation_id = self.summarisation_logger.start_invocation()
+                if self.verbose:
+                    print(f"🆕 [Invocation] Started {invocation_id}")
 
     def check_and_summarise_before_model_call(self, event: BeforeModelCallEvent) -> None:
         """

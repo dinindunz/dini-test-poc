@@ -51,8 +51,12 @@ class SummarisationLogger:
             summarised_messages: The messages after summarisation (None if no summarisation occurred)
             metadata: Additional metadata about the cycle
         """
+        # Ensure invocation was started (should be called by hook)
         if self.current_invocation_dir is None:
-            self.start_invocation()
+            raise RuntimeError(
+                "log_cycle() called before start_invocation(). "
+                "Ensure BeforeInvocationEvent hook is registered."
+            )
 
         self.cycle_count += 1
         cycle_dir = self.current_invocation_dir / f"cycle_{self.cycle_count:03d}"
